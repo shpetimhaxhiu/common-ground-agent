@@ -18,6 +18,19 @@ export const requestSchema = z.object({
   time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
   revision: z.enum(["balanced", "quieter", "less-expensive", "surprise"]),
   excluded: z.array(z.string().max(150)).max(20),
+  resolutions: z
+    .array(
+      z.object({
+        input: z.string().min(1).max(100),
+        id: z
+          .string()
+          .regex(/^urn:tag:[a-zA-Z0-9:_-]+$/)
+          .max(200),
+        name: z.string().min(1).max(100),
+      })
+    )
+    .max(20)
+    .optional(),
 })
 export type PlanningRequest = z.infer<typeof requestSchema>
 export type Candidate = {

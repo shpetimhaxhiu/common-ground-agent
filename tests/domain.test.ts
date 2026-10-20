@@ -168,3 +168,57 @@ test("live entity exclusions are applied without renaming or inventing replaceme
     ["remain"]
   )
 })
+
+test("ambiguous provider tags surface bounded choices rather than guessing", async () => {
+  const { normalizeLiveResult, QlooResolutionError } =
+    await import("../lib/qloo")
+  assert.throws(
+    () =>
+      normalizeLiveResult(
+        {
+          status: "needs_input",
+          resolution: {
+            issues: [
+              {
+                input: "Coffee",
+                candidates: [
+                  {
+                    id: "urn:tag:cuisine:qloo:coffee",
+                    name: "Coffee",
+                    type: "urn:tag:cuisine:qloo",
+                  },
+                  { id: "not-a-tag", name: "Wrong type" },
+                ],
+              },
+            ],
+          },
+        },
+        initialRequest
+      ),
+    (error: unknown) => {
+      assert(error instanceof QlooResolutionError)
+      assert.equal(error.issues[0].input, "Coffee")
+      assert.equal(error.issues[0].candidates.length, 1)
+      return true
+    }
+  )
+})
+
+test("explicit tag choices are bounded and cannot inject arbitrary request destinations", () => {
+  assert(
+    requestSchema.safeParse({
+      ...initialRequest,
+      resolutions: [
+        { input: "Coffee", id: "urn:tag:cuisine:qloo:coffee", name: "Coffee" },
+      ],
+    }).success
+  )
+  assert(
+    !requestSchema.safeParse({
+      ...initialRequest,
+      resolutions: [
+        { input: "Coffee", id: "https://example.org", name: "Coffee" },
+      ],
+    }).success
+  )
+})

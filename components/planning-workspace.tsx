@@ -46,18 +46,29 @@ type SavedPlan = {
   candidate: Candidate
   createdAt: string
 }
+type ResolutionIssue = {
+  input: string
+  candidates: { id: string; name: string; type?: string }[]
+}
 const directions = {
   balanced: "Keep it balanced",
   quieter: "Somewhere quieter",
   "less-expensive": "Spend a little less",
   surprise: "Surprise us",
 } as const
-export function PlanningWorkspace() {
+export function PlanningWorkspace({
+  liveAvailable = false,
+}: {
+  liveAvailable?: boolean
+}) {
   const [form, setForm] = useState<PlanningRequest>(initialRequest)
   const [interestText, setInterestText] = useState<Record<string, string>>({})
   const [result, setResult] = useState<PlanningResult | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
+  const [resolutionIssues, setResolutionIssues] = useState<ResolutionIssue[]>(
+    []
+  )
   const [notice, setNotice] = useState("")
   const [selected, setSelected] = useState<Candidate | null>(null)
   const [saved, setSaved] = useState<SavedPlan[]>([])
@@ -92,6 +103,7 @@ export function PlanningWorkspace() {
     }))
   async function buildPlan(next: PlanningRequest = form) {
     setError("")
+    setResolutionIssues([])
     setNotice("")
     setBusy(true)
     setSelected(null)
@@ -103,8 +115,10 @@ export function PlanningWorkspace() {
         body: JSON.stringify(next),
       })
       const body = await response.json()
-      if (!response.ok)
+      if (!response.ok) {
+        setResolutionIssues(body.resolutionIssues ?? [])
         throw new Error(body.error || "The plan could not be prepared.")
+      }
       setResult(body)
       setForm(next)
     } catch (e) {
@@ -178,6 +192,7 @@ export function PlanningWorkspace() {
       form.revision,
       form.excluded,
       form.participants,
+      form.resolutions,
     ]) !==
       JSON.stringify([
         result.request.mode,
@@ -188,6 +203,7 @@ export function PlanningWorkspace() {
         result.request.revision,
         result.request.excluded,
         result.request.participants,
+        result.request.resolutions,
       ])
   return (
     <div className="workspace">
@@ -231,9 +247,9 @@ export function PlanningWorkspace() {
               <li>Save or copy a plan after checking the unknowns.</li>
             </ol>
             <p className="small-copy">
-              The sample contains fictional places. Live Qloo access is pending.
-              Cultural affinities cannot establish an individual’s preference,
-              venue noise, opening hours or access.
+              The sample contains fictional places. Live mode queries Qloo for
+              cultural affinities. Cultural affinities cannot establish an
+              individual’s preference, venue noise, opening hours or access.
             </p>
           </DialogContent>
         </Dialog>
@@ -241,8 +257,8 @@ export function PlanningWorkspace() {
       <div className="sample-ribbon" role="status">
         <span className="status-dot" />
         {form.mode === "sample"
-          ? "SAMPLE WORKSPACE · Fictional places and prices. Live Qloo is not connected."
-          : "LIVE MODE · Qloo access pending. No fallback to sample results."}
+          ? `SAMPLE WORKSPACE · Fictional places and prices. ${liveAvailable ? "Choose Live Qloo for real provider results." : "Live Qloo is disabled on this server."}`
+          : "LIVE QLOO · Real cultural affinities. Venue conditions still need checking."}
       </div>
       <main>
         <section className="hero" aria-labelledby="hero-title">
@@ -482,7 +498,9 @@ export function PlanningWorkspace() {
                 }
               >
                 <option value="sample">Explore fictional sample</option>
-                <option value="live">Live Qloo · access pending</option>
+                <option value="live" disabled={!liveAvailable}>
+                  Live Qloo · {liveAvailable ? "real results" : "disabled"}
+                </option>
               </select>
               <Button
                 className="find-button"
@@ -494,13 +512,13 @@ export function PlanningWorkspace() {
                 ) : (
                   <Compass size={17} />
                 )}
-                Find common ground
+                {busy ? "Finding common ground…" : "Find common ground"}
                 <ArrowRight size={16} />
               </Button>
               <p className="occasion-note">
                 {form.mode === "sample"
                   ? "Sample works in Prishtina only. Places and prices are fictional."
-                  : "Live budgets are targets. Venue details must be checked."}
+                  : "Use a precise city name. Budget is a target; verify venue details."}
               </p>
             </aside>
           </div>
@@ -522,6 +540,65 @@ export function PlanningWorkspace() {
               <Check size={16} />
               {notice}
             </p>
+          )}
+          {resolutionIssues.length > 0 && (
+            <div
+              className="resolution-panel"
+              aria-label="Clarify your interests"
+            >
+              <h3>A little more specific, please.</h3>
+              <p>
+                Choose the meaning you intended, then prepare the plan again. If
+                no choice fits, edit that interest above.
+              </p>
+              {resolutionIssues.map((issue) => (
+                <div className="resolution-choice" key={issue.input}>
+                  <Label htmlFor={`resolve-${issue.input}`}>
+                    {issue.input}
+                  </Label>
+                  {issue.candidates.length > 0 ? (
+                    <select
+                      id={`resolve-${issue.input}`}
+                      value={
+                        form.resolutions?.find((r) => r.input === issue.input)
+                          ?.id ?? ""
+                      }
+                      onChange={(event) => {
+                        const choice = issue.candidates.find(
+                          (c) => c.id === event.target.value
+                        )
+                        setForm((previous) => ({
+                          ...previous,
+                          resolutions: [
+                            ...(previous.resolutions ?? []).filter(
+                              (r) => r.input !== issue.input
+                            ),
+                            ...(choice
+                              ? [
+                                  {
+                                    input: issue.input,
+                                    id: choice.id,
+                                    name: choice.name,
+                                  },
+                                ]
+                              : []),
+                          ],
+                        }))
+                      }}
+                    >
+                      <option value="">Choose a meaning…</option>
+                      {issue.candidates.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} · {c.type?.replace("urn:tag:", "") ?? c.id}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p>No matching Qloo tag. Try a more specific interest.</p>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </section>
         <section

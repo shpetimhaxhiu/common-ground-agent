@@ -12,11 +12,25 @@ assert.equal(response.status, 200)
 const result = await response.json()
 assert.equal(result.candidates[0].name, "Paper Moon")
 console.log("PASS real plan API returns the sample shortlist")
-assert.equal(
-  (await post("/api/plan", { ...initialRequest, mode: "live" })).status,
-  503
-)
-console.log("PASS live mode fails explicitly without sample fallback")
+if (process.argv.includes("--expect-live-disabled")) {
+  assert.equal(
+    (await post("/api/plan", { ...initialRequest, mode: "live" })).status,
+    503
+  )
+  console.log("PASS live mode fails explicitly without sample fallback")
+} else {
+  assert.equal(
+    (
+      await post("/api/plan", {
+        ...initialRequest,
+        mode: "live",
+        participants: [],
+      })
+    ).status,
+    400
+  )
+  console.log("PASS invalid live request rejected before using API quota")
+}
 assert.equal(
   (await post("/api/plan", initialRequest, "https://untrusted.example")).status,
   403
@@ -33,7 +47,7 @@ const save = await post("/api/saved", {
 })
 assert.equal(save.status, 201)
 const cookie = save.headers.get("set-cookie")?.split(";")[0]
-assert(cookie);
+assert(cookie)
 assert(cookie.startsWith("cg_collection="))
 assert.match(save.headers.get("set-cookie") ?? "", /HttpOnly/i)
 const own = await fetch(base + "/api/saved", { headers: { cookie } })

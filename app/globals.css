@@ -1310,3 +1310,9 @@ footer > span {
     transition: none !important;
   }
 }
+
+.resolution-panel{margin-top:1.5rem;padding:1.5rem;border:1px solid var(--border);border-radius:1rem;background:var(--card)}
+.resolution-panel h3{font-size:1.2rem;margin-bottom:.5rem}
+.resolution-panel p{max-width:65ch;font-size:.9rem;line-height:1.6}
+.resolution-choice{display:grid;gap:.5rem;margin-top:1rem;min-width:0}
+.resolution-choice select{max-width:100%;width:100%;padding:.7rem;border:1px solid var(--border);border-radius:.5rem;background:var(--background);color:var(--foreground)}

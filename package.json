@@ -10,7 +10,7 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/domain.test.ts",
+    "test": "tsx --test tests/*.test.ts",
     "db:create": "node scripts/db-create.mjs",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",

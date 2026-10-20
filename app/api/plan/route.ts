@@ -1,5 +1,6 @@
 import { requestSchema, planSample } from "@/lib/domain"
-import { planLive } from "@/lib/qloo"
+import { planLive, QlooResolutionError } from "@/lib/qloo"
+import { QlooTransportError } from "@/lib/qloo-client"
 
 export const runtime = "nodejs"
 export async function POST(request: Request) {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Live Qloo access is pending. Use the clearly labeled sample workspace while access is being configured.",
+            "Live Qloo is disabled on this server. The sample workspace is available separately.",
         },
         { status: 503 }
       )
@@ -30,6 +31,33 @@ export async function POST(request: Request) {
       input.mode === "sample" ? planSample(input) : await planLive(input)
     )
   } catch (error) {
+    let cause: unknown = error
+    for (let depth = 0; depth < 5 && cause instanceof Error; depth++) {
+      if (cause instanceof QlooTransportError)
+        return Response.json({ error: cause.message }, { status: cause.status })
+      cause = cause.cause
+    }
+    if (error instanceof QlooResolutionError)
+      return Response.json(
+        { error: error.message, resolutionIssues: error.issues },
+        { status: 409 }
+      )
+    if (error && typeof error === "object" && "code" in error) {
+      const code = String(error.code)
+      const messages: Record<string, string> = {
+        QLOO_AUTH:
+          "Live Qloo access was rejected. Check the server credentials and event access period.",
+        QLOO_RATE_LIMIT:
+          "Live Qloo has reached a usage limit. Wait before trying again.",
+        QLOO_TIMEOUT:
+          "Live Qloo took too long. Your inputs are preserved; try again later.",
+      }
+      if (messages[code])
+        return Response.json(
+          { error: messages[code] },
+          { status: code === "QLOO_RATE_LIMIT" ? 429 : 502 }
+        )
+    }
     if (error instanceof SyntaxError)
       return Response.json(
         { error: "The request could not be read." },

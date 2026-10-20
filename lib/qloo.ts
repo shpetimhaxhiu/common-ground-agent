@@ -1,5 +1,33 @@
 import { z } from "zod"
 import type { Candidate, PlanningRequest, PlanningResult } from "./domain"
+import { createHackathonClient } from "./qloo-client"
+export type ResolutionIssue = {
+  input: string
+  candidates: { id: string; name: string; type?: string }[]
+}
+export class QlooResolutionError extends Error {
+  constructor(public issues: ResolutionIssue[]) {
+    super(
+      "Qloo could not resolve every interest. Choose the intended meaning or edit the interest."
+    )
+  }
+}
+const resolutionSchema = z.object({
+  issues: z.array(
+    z.object({
+      input: z.string(),
+      candidates: z
+        .array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            type: z.string().optional(),
+          })
+        )
+        .optional(),
+    })
+  ),
+})
 
 // Shape verified against @qloo/qloo-harness 0.1.26 qloo-tools.js / compactEntity.
 const entitySchema = z
@@ -7,6 +35,7 @@ const entitySchema = z
     entity_id: z.string(),
     name: z.string(),
     type: z.string().optional(),
+    subtype: z.string().optional(),
     properties: z
       .object({
         description: z.string().optional(),
@@ -30,36 +59,82 @@ const envelopeSchema = z
   })
   .passthrough()
 
+const liveCache = new Map<string, { until: number; result: PlanningResult }>()
+let liveBusy = false
+let nextCallAt = 0
 export async function planLive(
   request: PlanningRequest
 ): Promise<PlanningResult> {
+  // Names, date and budget never go to Qloo or enter the shared provider cache key.
+  const key = JSON.stringify([
+    request.city,
+    request.participants.map((p) => p.interests),
+    request.resolutions,
+    request.excluded,
+    request.revision,
+  ])
+  const cached = liveCache.get(key)
+  if (cached && cached.until > Date.now())
+    return { ...cached.result, request, createdAt: new Date().toISOString() }
+  if (liveBusy || Date.now() < nextCallAt)
+    throw new Error(
+      "Live Qloo is busy. Wait a moment before preparing another plan."
+    )
+  liveBusy = true
+  try {
+    const result = await executeLive(request)
+    if (liveCache.size >= 32) liveCache.delete(liveCache.keys().next().value!)
+    // Keep only provider-derived results; never retain group nicknames in shared cache.
+    const anonymous = {
+      ...request,
+      participants: request.participants.map((p) => ({
+        ...p,
+        name: "Guest",
+        id: "guest",
+      })),
+    }
+    liveCache.set(key, {
+      until: Date.now() + 300_000,
+      result: { ...result, request: anonymous },
+    })
+    return result
+  } finally {
+    liveBusy = false
+    nextCallAt = Date.now() + 2_000
+  }
+}
+
+async function executeLive(request: PlanningRequest): Promise<PlanningResult> {
   if (!process.env.QLOO_API_KEY)
     throw new Error(
-      "Live Qloo is not connected. The event API key is pending; sample mode is available separately."
+      "Live Qloo is not configured. Sample mode is available separately."
     )
-  const { createDirectQlooWorkflowExecutorFromEnvironment } =
+  const { createDirectQlooWorkflowExecutor } =
     await import("@qloo/qloo-harness")
-  // No implicit credential/config fallback to another account or provider.
-  const executor = createDirectQlooWorkflowExecutorFromEnvironment({
-    env: {
-      QLOO_API_KEY: process.env.QLOO_API_KEY,
-      NODE_ENV: process.env.NODE_ENV,
-    },
-    readConfigFile: () => '{"api_key":""}',
-  })
-  if (!executor) throw new Error("Live Qloo authentication is unavailable.")
+  // Explicit client: no global config, default production endpoint or file logs.
+  const executor = createDirectQlooWorkflowExecutor(
+    createHackathonClient(process.env.QLOO_API_KEY),
+    {}
+  )
   const signals = [...new Set(request.participants.flatMap((p) => p.interests))]
+  if (signals.length > 8)
+    throw new Error(
+      "Live Qloo supports up to eight distinct interests per plan. Remove a few and try again."
+    )
+  const tags = signals.map(
+    (input) => request.resolutions?.find((r) => r.input === input)?.id ?? input
+  )
   const execution = await executor.execute(
     "recommend",
     {
       target_type: "place",
-      signal_tags: signals,
+      signal_tags: tags,
       signal_tags_operator: "union",
       filter_location: request.city,
-      limit: 12,
+      limit: 6,
       explain: true,
     },
-    { signal: AbortSignal.timeout(25_000) }
+    { signal: AbortSignal.timeout(45_000) }
   )
   return normalizeLiveResult(execution.result, request)
 }
@@ -69,11 +144,27 @@ export function normalizeLiveResult(
   request: PlanningRequest
 ): PlanningResult {
   const signals = [...new Set(request.participants.flatMap((p) => p.interests))]
-  const envelope = envelopeSchema.parse(payload)
-  if (envelope.status === "needs_input")
+  const parsedEnvelope = envelopeSchema.safeParse(payload)
+  if (!parsedEnvelope.success)
     throw new Error(
-      "Qloo could not resolve one or more interests or the location. Make the interests more specific and try again."
+      "Qloo did not return a valid result. Please try again later."
     )
+  const envelope = parsedEnvelope.data
+  if (envelope.status === "needs_input") {
+    const parsed = resolutionSchema.safeParse(
+      (payload as { resolution?: unknown }).resolution
+    )
+    throw new QlooResolutionError(
+      parsed.success
+        ? parsed.data.issues.map((i) => ({
+            input: i.input,
+            candidates: (i.candidates ?? [])
+              .filter((c) => c.id.startsWith("urn:tag:"))
+              .slice(0, 8),
+          }))
+        : []
+    )
+  }
   if (!["ok", "empty"].includes(envelope.status))
     throw new Error(
       "Qloo did not return a complete result. Please try again later."
@@ -88,7 +179,7 @@ export function normalizeLiveResult(
     .map((e) => ({
       id: e.entity_id,
       name: e.name,
-      kind: e.type?.replace("urn:entity:", "") ?? "Place",
+      kind: (e.subtype ?? e.type)?.replace(/^urn:entity:?/, "") || "Place",
       description:
         e.properties?.short_description ??
         e.properties?.description ??
@@ -122,6 +213,7 @@ export function normalizeLiveResult(
     warnings: [
       "Qloo affinity reflects aggregate cultural relationships, not personal preference predictions.",
       "Budget, opening hours, noise and accessibility are unverified. Budget is a target, not a filter on live results.",
+      "Location names are matched by Qloo. Use a precise city name and verify each address; no travel distance is calculated.",
       ...(request.revision === "quieter"
         ? [
             "Quietness cannot be verified by this provider. Check directly with the venue.",

@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "type": "module",
   "private": true,
+  "license": "MIT",
+  "author": "Shpetim Haxhiu",
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1 --port 3161",
     "build": "next build",

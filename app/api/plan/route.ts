@@ -1,8 +1,10 @@
 import { requestSchema, planSample } from "@/lib/domain"
 import { planLive, QlooResolutionError } from "@/lib/qloo"
 import { QlooTransportError } from "@/lib/qloo-client"
+import { planWithAgent } from "@/lib/planning-agent"
 
 export const runtime = "nodejs"
+export const maxDuration = 120
 export async function POST(request: Request) {
   if (
     request.headers.get("origin") !==
@@ -27,8 +29,26 @@ export async function POST(request: Request) {
         },
         { status: 503 }
       )
+    if (
+      input.mode === "live" &&
+      input.assistance === "agent" &&
+      (process.env.ENABLE_PLANNING_AGENT !== "true" ||
+        !process.env.OPENAI_API_KEY)
+    )
+      return Response.json(
+        {
+          error:
+            "The planning agent is disabled on this server. Choose direct Qloo results instead.",
+        },
+        { status: 503 }
+      )
     return Response.json(
-      input.mode === "sample" ? planSample(input) : await planLive(input)
+      input.mode === "sample"
+        ? planSample(input)
+        : input.assistance === "agent"
+          ? await planWithAgent(input)
+          : await planLive(input),
+      { headers: { "Cache-Control": "no-store" } }
     )
   } catch (error) {
     let cause: unknown = error
@@ -77,6 +97,7 @@ export async function POST(request: Request) {
       "Live Qloo",
       "Qloo could not",
       "Qloo did not",
+      "The planning agent",
     ]
     return Response.json(
       {

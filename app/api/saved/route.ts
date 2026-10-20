@@ -4,6 +4,7 @@ import { z } from "zod"
 import { db } from "@/lib/db"
 import { requestSchema } from "@/lib/domain"
 import type { Prisma } from "@/generated/prisma/client"
+import { agentReportSchema } from "@/lib/agent-contract"
 
 const candidateSchema = z.object({
   id: z.string().max(150),
@@ -23,6 +24,7 @@ const candidateSchema = z.object({
 const savedSchema = z.object({
   candidate: candidateSchema,
   result: z.object({
+    agent: agentReportSchema.optional(),
     mode: z.enum(["sample", "live"]),
     candidates: z.array(candidateSchema).max(12),
     trace: z.array(z.string().max(500)).max(12),

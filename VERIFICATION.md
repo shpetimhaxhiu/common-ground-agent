@@ -1,5 +1,19 @@
 # Verification — October 21, 2026
 
+## Latest update — OpenAI agent verified
+
+The user explicitly approved reuse of the configured OpenAI key. Earlier pending-credential and no-model-call statements below are superseded.
+
+- The existing key authenticated at the official OpenAI API. The model list included gpt-6-luna and a real Agents SDK 0.20.0 run succeeded with that model.
+- One live smoke run made five model calls, three Qloo entity lookups and one deterministic constraint review. It selected two inspected places and used 5,056 input tokens plus 357 output tokens. Raw output is private in ignored .runtime/agent-live-result.json. A separate Chrome run produced its own three-option report; output is not expected to be identical across runs.
+- Actual run content was reviewed: it identified that the available descriptions did not establish a jazz offering, and left price, quietness, hours, availability, dietary suitability and access unverified.
+- Server validation rejects invented, excluded, uninspected and duplicate IDs. Completion requires at least two inspected identities (or the sole candidate) and a constraint review. Model input omits guest names/internal guest IDs and bounds provider descriptions.
+- The agent has only read-only Qloo identity lookup and constraint-review tools. Configured limits: five model calls, 1,200 output tokens per call, a 75-second model phase, up to three entity inspections, zero SDK retries, tracing disabled and Responses storage disabled. Qloo preflight has its existing 45-second limit. Public usage enforcement is still required before exposing paid model calls.
+- Chrome verified the real agent path through the app: Coffee clarification, model/tool run, report display, collapsible controls, save to the existing private collection, reload and reopen with the agent report intact. The Saved plans label distinguishes agent + Qloo from direct live results.
+- Desktop report and 390px mobile report inspected. Mobile document width 381px and report width about 330px at a 390px viewport; no horizontal overflow. Viewport restored. Ignored screenshots: evidence/agent-live-desktop.jpg and evidence/agent-live-mobile.jpg.
+- Nineteen offline tests, eight HTTP/database checks, TypeScript, ESLint and the final production build pass. The official AI Elements install introduced a static-component lint failure in its unused shimmer helper; that helper and motion dependency were removed, retaining the Plan component with aria-busy for static reports.
+- A public-source package is prepared with an MIT license for original code and preserved Apache-2.0/third-party notices for adapted components. The proposed GitHub repository does not yet exist. No source was pushed, no Common Ground hosting was created and no Qloo entry was submitted.
+
 ## Live integration update — October 21
 
 - Issued event credential authenticated successfully at the exact official hackathon host. The first probe returned HTTP 200, 50,000/month and 10/second limits, with 49,999 monthly requests remaining immediately after that probe. No current-balance claim is made.

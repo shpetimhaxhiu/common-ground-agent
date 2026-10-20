@@ -23,6 +23,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
+  Plan,
+  PlanHeader,
+  PlanTitle,
+  PlanDescription,
+  PlanContent,
+  PlanTrigger,
+} from "@/components/ai-elements/plan"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -58,8 +66,10 @@ const directions = {
 } as const
 export function PlanningWorkspace({
   liveAvailable = false,
+  agentAvailable = false,
 }: {
   liveAvailable?: boolean
+  agentAvailable?: boolean
 }) {
   const [form, setForm] = useState<PlanningRequest>(initialRequest)
   const [interestText, setInterestText] = useState<Record<string, string>>({})
@@ -185,6 +195,7 @@ export function PlanningWorkspace({
     result &&
     JSON.stringify([
       form.mode,
+      form.assistance,
       form.city,
       form.budget,
       form.date,
@@ -196,6 +207,7 @@ export function PlanningWorkspace({
     ]) !==
       JSON.stringify([
         result.request.mode,
+        result.request.assistance,
         result.request.city,
         result.request.budget,
         result.request.date,
@@ -502,6 +514,35 @@ export function PlanningWorkspace({
                   Live Qloo · {liveAvailable ? "real results" : "disabled"}
                 </option>
               </select>
+              {form.mode === "live" && (
+                <>
+                  <Label htmlFor="planning-approach">Planning approach</Label>
+                  <select
+                    id="planning-approach"
+                    value={form.assistance ?? "qloo"}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        assistance: event.target.value as "qloo" | "agent",
+                      })
+                    }
+                  >
+                    <option value="qloo">Direct Qloo shortlist</option>
+                    <option value="agent" disabled={!agentAvailable}>
+                      Agent · inspect and compare
+                      {agentAvailable ? "" : " (disabled)"}
+                    </option>
+                  </select>
+                  {form.assistance === "agent" && (
+                    <p className="occasion-note">
+                      OpenAI inspects Qloo options and suggests a shortlist.
+                      Guest names stay local. City, interests and provider
+                      descriptions are shared with OpenAI. Allow up to two
+                      minutes.
+                    </p>
+                  )}
+                </>
+              )}
               <Button
                 className="find-button"
                 disabled={busy}
@@ -606,6 +647,53 @@ export function PlanningWorkspace({
           aria-labelledby="shortlist-title"
           aria-busy={busy}
         >
+          {result?.agent && (
+            <Plan className="agent-plan" defaultOpen>
+              <PlanHeader>
+                <div>
+                  <PlanTitle role="heading" aria-level={2}>
+                    A suggestion from your host.
+                  </PlanTitle>
+                  <PlanDescription>{result.agent.summary}</PlanDescription>
+                  <p className="small-copy">
+                    AI interpretation · Personal fit and venue conditions still
+                    need checking.
+                  </p>
+                </div>
+                <PlanTrigger />
+              </PlanHeader>
+              <PlanContent>
+                <ol className="agent-selections">
+                  {result.agent.selections.map((selection) => (
+                    <li key={selection.id}>
+                      <b>
+                        {
+                          result.candidates.find((c) => c.id === selection.id)
+                            ?.name
+                        }
+                      </b>
+                      <p>{selection.reason}</p>
+                      <p className="small-copy">
+                        To discuss: {selection.tradeoff}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+                <details className="agent-activity">
+                  <summary>What the agent checked</summary>
+                  <ul>
+                    {result.agent.activity.map((item, index) => (
+                      <li key={index}>{item.detail}</li>
+                    ))}
+                  </ul>
+                  <p className="small-copy">
+                    Completed checks · Venue data from Qloo; suggestions from
+                    OpenAI.
+                  </p>
+                </details>
+              </PlanContent>
+            </Plan>
+          )}
           <div className="section-heading">
             <div>
               <p className="eyebrow">02 / THE POSSIBILITIES</p>
@@ -934,7 +1022,7 @@ export function PlanningWorkspace({
                     <b>{plan.title}</b>
                     <small>
                       {plan.result.request.city} · {plan.result.request.date} ·{" "}
-                      {plan.result.mode}
+                      {plan.result.agent ? "agent + Qloo" : plan.result.mode}
                     </small>
                   </span>
                   <ArrowRight size={16} />

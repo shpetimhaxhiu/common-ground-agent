@@ -1,7 +1,9 @@
 import { z } from "zod"
+import type { AgentReport } from "./agent-contract"
 
 export const requestSchema = z.object({
   mode: z.enum(["sample", "live"]),
+  assistance: z.enum(["qloo", "agent"]).optional(),
   city: z.string().trim().min(2).max(80),
   participants: z
     .array(
@@ -47,6 +49,7 @@ export type Candidate = {
   links: { label: string; url: string }[]
 }
 export type PlanningResult = {
+  agent?: AgentReport
   mode: "sample" | "live"
   candidates: Candidate[]
   trace: string[]

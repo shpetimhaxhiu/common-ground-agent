@@ -1,5 +1,21 @@
 # Verification — October 21, 2026
 
+## Public Vercel release — verified
+
+- User approved repurposing the proposed empty template. Renamed to common-ground-agent, project prj_hOV7qS2tjgCdiswz04tA0qlLxRM1, scope shpetimhaxhius-projects. No deletion, paid upgrade or new hosting purchase.
+- Canonical URL https://common-ground-agent.vercel.app returns HTTP 200 without authentication. Public source https://github.com/shpetimhaxhiu/common-ground-agent remains MIT.
+- Final production deployment dpl_7yXyjKQZFXMZ2MFhJcQXv9U2EqZc is READY, built from source commit 70501d7. Deployment URL: https://common-ground-agent-c7nkea637-shpetimhaxhius-projects.vercel.app .
+- All seven required production variables verified as sensitive, by name/type only. No credential appeared in source, console output, screenshots or docs. Existing isolated PostgreSQL schema and verified CA remain in use.
+- First fresh cloud build exposed undeclared pnpm install-script permissions. Explicitly allowed Prisma engines, Prisma and esbuild; explicitly denied unrelated Google SDK/protobuf scripts. Frozen install and local/cloud production builds pass.
+- Eight anonymous public HTTP/database checks passed on the final deployment, including cross-origin rejection, saved collection persistence/isolation and Better Auth null session.
+- Chrome public Qloo comparison returned three real places and per-interest affinity/rank rows. Public agent completed one comparison, three entity inspections and mandatory constraint review, with identity-bound suggestions. Saved the agent plan, refreshed and reopened it with its report intact.
+- Shared production counters confirm one reserved agent run and two live attempts during verification; global agent allowance remains 90. No limit was reset or expanded.
+- Public mobile report: 390px viewport, 381px document, about 330px report; no horizontal document overflow. Viewport restored. Final screenshot evidence/public-common-ground-desktop.png is private/ignored.
+- Final UI patch shows Loading your saved plans while fetching instead of an empty-state flash; live example chooses a date three days ahead. Both verified on the final release, and the saved report remains preserved.
+- Runtime-error query for this project returned no clusters; final deployment error/fatal log count query was empty. This describes observed release checks, not future uptime.
+- The reused project retains v0-managed Git metadata. Vercel denied CLI reconnection; no restriction was bypassed. Release was deployed directly from this scoped verified checkout; GitHub pushes alone are not the deployment workflow.
+- Devpost My projects still requires registration; no Qloo contest registration or submission is claimed. Entry draft now includes real public links and judge testing steps.
+
 ## Dependency release check
 
 - GitHub initially reported Undici 8.9.0 and Lodash 4.17.21 advisories. pnpm-workspace.yaml now overrides affected Undici 8.x to 8.10.2 and Lodash to 4.18.1. shadcn CLI moved to devDependencies. pnpm version pinned at 11.25.0.

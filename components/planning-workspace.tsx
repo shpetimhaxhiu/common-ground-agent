@@ -523,11 +523,15 @@ export function PlanningWorkspace({
                     onChange={(event) =>
                       setForm({
                         ...form,
-                        assistance: event.target.value as "qloo" | "agent",
+                        assistance: event.target.value as
+                          "qloo" | "compare" | "agent",
                       })
                     }
                   >
                     <option value="qloo">Direct Qloo shortlist</option>
+                    <option value="compare">
+                      Compare everyone’s signals · Qloo
+                    </option>
                     <option value="agent" disabled={!agentAvailable}>
                       Agent · inspect and compare
                       {agentAvailable ? "" : " (disabled)"}
@@ -536,9 +540,9 @@ export function PlanningWorkspace({
                   {form.assistance === "agent" && (
                     <p className="occasion-note">
                       OpenAI inspects Qloo options and suggests a shortlist.
-                      Guest names stay local. City, interests and provider
-                      descriptions are shared with OpenAI. Allow up to two
-                      minutes.
+                      Guest names are not sent to OpenAI. City, interests and
+                      provider descriptions are shared with OpenAI. Allow up to
+                      two minutes.
                     </p>
                   )}
                 </>
@@ -556,6 +560,42 @@ export function PlanningWorkspace({
                 {busy ? "Finding common ground…" : "Find common ground"}
                 <ArrowRight size={16} />
               </Button>
+              {liveAvailable && (
+                <Button
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => {
+                    setForm({
+                      ...initialRequest,
+                      mode: "live",
+                      assistance: "compare",
+                      city: "New York City",
+                      participants: initialRequest.participants
+                        .slice(0, 2)
+                        .map((p, i) => ({
+                          ...p,
+                          name: i ? "Sam" : "Alex",
+                          interests: [i ? "Coffee" : "Jazz"],
+                        })),
+                      resolutions: [
+                        {
+                          input: "Coffee",
+                          id: "urn:tag:cuisine:qloo:coffee",
+                          name: "Coffee",
+                        },
+                      ],
+                    })
+                    setInterestText({})
+                    setResult(null)
+                    setResolutionIssues([])
+                    setExclusions([])
+                    setError("")
+                  }}
+                >
+                  Try a real comparison
+                  <ArrowRight size={16} />
+                </Button>
+              )}
               <p className="occasion-note">
                 {form.mode === "sample"
                   ? "Sample works in Prishtina only. Places and prices are fictional."
@@ -647,6 +687,71 @@ export function PlanningWorkspace({
           aria-labelledby="shortlist-title"
           aria-busy={busy}
         >
+          {result?.coverage && (
+            <section
+              className="signal-comparison"
+              aria-labelledby="signals-title"
+            >
+              <p className="eyebrow">THE OVERLAP / LIVE QLOO</p>
+              <h2 id="signals-title">Make the trade-off visible.</h2>
+              <p>
+                Each column compares the same places against one guest’s stated
+                interests. The balanced starting point has the best worst rank,
+                with ties settled by the sum of ranks.
+              </p>
+              <div className="signal-scroll">
+                <table>
+                  <caption>
+                    Raw aggregate affinity and relative rank within this
+                    shortlist
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Place</th>
+                      {result.coverage.profiles.map((p) => (
+                        <th scope="col" key={p.index}>
+                          Guest {p.index + 1}
+                          <small>{p.interests.join(" + ")}</small>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.coverage.rows.map((row) => (
+                      <tr key={row.id}>
+                        <th scope="row">
+                          {result.candidates.find((c) => c.id === row.id)
+                            ?.name ?? "Other Qloo candidate"}
+                          {result.coverage?.balancedIds[0] === row.id && (
+                            <small className="balance-label">
+                              Balanced starting point
+                            </small>
+                          )}
+                        </th>
+                        {row.affinities.map((score, i) => (
+                          <td key={i}>
+                            {score === null ? (
+                              "No signal"
+                            ) : (
+                              <>
+                                <b>#{row.ranks[i]}</b>
+                                <small>Affinity {score.toFixed(3)}</small>
+                              </>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="small-copy">
+                Cultural affinity signals are not personal satisfaction scores.
+                Absolute scores across columns are not calibrated to one
+                another. Missing signals remain unknown.
+              </p>
+            </section>
+          )}
           {result?.agent && (
             <Plan className="agent-plan" defaultOpen>
               <PlanHeader>
@@ -904,7 +1009,7 @@ export function PlanningWorkspace({
           Common Ground<span className="wordmark-dot">.</span>
         </Link>
         <p>Good plans leave room for people.</p>
-        <span>LOCAL BUILD · NO RESERVATIONS OR PURCHASES</span>
+        <span>NO RESERVATIONS OR PURCHASES</span>
       </footer>
       <Dialog
         open={!!selected}

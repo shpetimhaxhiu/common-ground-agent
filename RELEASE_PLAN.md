@@ -23,3 +23,7 @@ Store Qloo/OpenAI credentials only in the approved host's secret store after des
 ## Contest delivery
 
 ENTRY_DRAFT.md is the current truthful story. Add verified public source/demo URLs after release. Recheck current official Qloo rules, eligibility and required fields. A final prize entry and any new binding agreements require the appropriate human action/confirmation. No submitted or winning status is claimed.
+
+## October 21 authorization and hosting state
+
+Public source/demo publication is explicitly approved. Private OpenAI/Qloo secret transfer to common-ground-agent in shpetimhaxhius-projects and $5 maximum existing model credit are approved. Shared PostgreSQL counter reservations and per-model request bounds implemented. Existing remote DB isolated schema and verified TLS are ready. Vercel project creation rejected at 200-project Hobby limit. Empty next-js-saas-starter-template has no deployments/domains; specific rename/repurpose approval pending. Do not replace a working project or upgrade billing.

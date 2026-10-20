@@ -42,3 +42,5 @@ next-env.d.ts
 /generated/
 /.runtime/
 /evidence/
+
+!certs/hetzner-sql-ca.pem

@@ -5,6 +5,10 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+model UsageCounter {
+  id String @id
+  count Int @default(0)
+}
 model SavedPlan {
   id String @id @default(cuid())
   ownerHash String

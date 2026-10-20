@@ -2,6 +2,8 @@ import { requestSchema, planSample } from "@/lib/domain"
 import { planLive, QlooResolutionError } from "@/lib/qloo"
 import { QlooTransportError } from "@/lib/qloo-client"
 import { planWithAgent } from "@/lib/planning-agent"
+import { planCompared } from "@/lib/qloo-coverage"
+import { DemoLimitError, reserveLiveRequest } from "@/lib/usage"
 
 export const runtime = "nodejs"
 export const maxDuration = 120
@@ -42,15 +44,20 @@ export async function POST(request: Request) {
         },
         { status: 503 }
       )
+    if (input.mode === "live") await reserveLiveRequest(request)
     return Response.json(
       input.mode === "sample"
         ? planSample(input)
         : input.assistance === "agent"
           ? await planWithAgent(input)
-          : await planLive(input),
+          : input.assistance === "compare"
+            ? await planCompared(input)
+            : await planLive(input),
       { headers: { "Cache-Control": "no-store" } }
     )
   } catch (error) {
+    if (error instanceof DemoLimitError)
+      return Response.json({ error: error.message }, { status: 429 })
     let cause: unknown = error
     for (let depth = 0; depth < 5 && cause instanceof Error; depth++) {
       if (cause instanceof QlooTransportError)

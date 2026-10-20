@@ -1,3 +1,4 @@
+import "dotenv/config"
 // Explicit live smoke test. Uses event quota and the approved OpenAI key.
 import { config } from "dotenv"
 import { mkdir, writeFile } from "node:fs/promises"

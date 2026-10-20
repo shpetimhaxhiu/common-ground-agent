@@ -20,3 +20,5 @@
 - `tests/api-smoke.ts`: actual local HTTP/database checks, writes a fictional fixture to its own test collection.
 
 User explicitly approved reuse of the configured OpenAI key on October 21. The agent loop is implemented and live-verified with gpt-6-luna, read-only Qloo tools, mandatory constraint review and structured identity-bound selection. No model secret was copied or printed. Qloo and agent flags are enabled locally in ignored .env; the OpenAI key comes from the existing server environment. No public deployment or Qloo submission exists. Before a public release, obtain concrete publication/destination approval and implement shared public-demo usage enforcement; local process locks are insufficient for a scaled public service.
+
+Latest: publication and named Vercel secret transfer approved, with $5 maximum model credit. Shared quotas are in lib/usage.ts with an additive UsageCounter migration; compare logic is lib/coverage.ts and lib/qloo-coverage.ts. Production schema/TLS verified, Vercel project limit awaiting empty-template repurposing approval. Earlier pending-approval statements above are superseded.

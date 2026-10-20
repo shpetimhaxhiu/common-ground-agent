@@ -1,6 +1,16 @@
 # Verification — October 21, 2026
 
-## Latest update — OpenAI agent verified
+## Latest release verification — comparison and shared quotas
+
+- Real Qloo same-shortlist comparison returned three rows for two explicit interest profiles. Raw affinities and relative ranks render in Chrome; no scores were fabricated.
+- Revised agent: six model calls, five completed tool activities (comparison, three identity inspections, constraint review), 7,899 input and 492 output tokens. Structured selection passed identity and balance validation.
+- Shared PostgreSQL usage reservations tested with 12 concurrent attempts against a limit of three: exactly three succeeded. Exhaustion rolled back an earlier counter in the same transaction.
+- Twenty-two offline tests, eight API/database checks, TypeScript, lint and production build passed. Dev server was restarted after regenerating Prisma to clear an outdated cached client.
+- Production schema was created separately on the existing remote PostgreSQL database; both additive migrations applied. TLS connection verified with the CA published by Hetzner; certificate verification was not disabled.
+- Vercel refused project creation at the account’s 200-project Hobby limit. Empty next-js-saas-starter-template has no deployments or domains; repurposing approval requested. No working project was replaced.
+- Source publication, private Vercel secrets and up to $5 model credit approved. Public reservations use at most $4.50, leaving $0.50 for bounded release checks. No paid hosting upgrade authorized.
+
+## Earlier update — OpenAI agent verified
 
 The user explicitly approved reuse of the configured OpenAI key. Earlier pending-credential and no-model-call statements below are superseded.
 

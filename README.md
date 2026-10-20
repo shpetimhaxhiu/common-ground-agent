@@ -1,8 +1,8 @@
 # Common Ground
 
-A local group-outing planner for the Qloo Agentic Hackathon. Bring two to four explicit taste profiles together, inspect trade-offs, revise a shortlist, and save or copy a plan.
+A group-outing planner for the Qloo Agentic Hackathon. Bring two to four explicit taste profiles together, inspect trade-offs, revise a shortlist, and save or copy a plan.
 
-**Status: live Qloo planning verified locally; not a completed contest entry.** The issued event key works, and live recommendations, interest clarification and private saved-plan persistence have been exercised in Chrome. The fictional sample remains separately labeled. The user approved reuse of the configured OpenAI key. A bounded OpenAI Agents SDK host now inspects real Qloo candidates, reviews unknown constraints and returns a validated shortlist. Browser agent save/reload/reopen is verified. Public release and the final Qloo entry are still pending.
+**Status: live Qloo planning verified locally; not a completed contest entry.** The issued event key works, and live recommendations, interest clarification and private saved-plan persistence have been exercised in Chrome. The fictional sample remains separately labeled. The user approved reuse of the configured OpenAI key. A bounded OpenAI Agents SDK host now inspects real Qloo candidates, reviews unknown constraints and returns a validated shortlist. Browser agent save/reload/reopen is verified. Public release is being prepared; the final Qloo entry remains pending.
 
 ## Run locally
 
@@ -37,7 +37,7 @@ API access email from hackathon@qloo.com was verified on October 21, 2026 (messa
 
 The adapter uses `createDirectQlooWorkflowExecutor` / `recommend` from official harness 0.1.26 with an explicit event-only HTTP transport. Requests use X-Api-Key, reject redirects, never read global Qloo configuration, and write no harness execution logs. The transport sets documented `filter.location.radius=0`; names are still fuzzy-matched by Qloo, so use a precise city name and verify addresses. Direct-mode provider order and identity are retained; explicit entity exclusions are applied without invented replacements. Ambiguous tag meanings become user choices; unknown interests need editing. Prices, noise, individual fit and availability remain unknown. Agent mode may reorder or narrow those options and labels its editorial suggestions separately. OpenAI Agents SDK runs the model loop; AI Elements provides the report UI. The AI SDK guidance was followed, but no second AI SDK model loop is used.
 
-Live calls are bounded to eight distinct interests, ten upstream requests per workflow and 45 seconds total. A 150ms spacing between upstream starts and a single in-flight workflow per process reduce rate pressure. Successful results use a bounded private five-minute in-memory cache with no guest names. This is local-demo protection, not a distributed public-deployment quota control. No raw provider responses belong in a public repository; opt-in smoke evidence stays in ignored `.runtime/`.
+Live calls are bounded to eight distinct interests, ten upstream requests per workflow and 45 seconds total. A 150ms spacing between upstream starts and a single in-flight workflow per process reduce rate pressure. Successful results use a bounded private five-minute in-memory cache with no guest names. Additional per-profile comparison and identity inspection use a second bounded transport. Shared PostgreSQL counters constrain public workflows across instances. No raw provider responses belong in a public repository; opt-in smoke evidence stays in ignored `.runtime/`.
 
 The official Node harness must remain external in Next.js (`serverExternalPackages`) because it loads filesystem resources. A deployment needs a compatible Node runtime and its dependencies; it cannot be exported as a static website. Budget/quietness refinements are demonstrated only against fictional fixtures. Do not imply these attributes are verified for Qloo places.
 
@@ -48,7 +48,7 @@ The user explicitly approved reuse of the existing server OPENAI_API_KEY on Octo
 
 The agent can inspect up to three candidate identities through Qloo /entities and must inspect at least two (or the sole result) before a constraint review. It then returns a structured selection. Server validation rejects duplicates, invented/excluded/uninspected IDs, missing evidence checks and malformed decisions. Editorial comments remain unverified suggestions. It has no booking, payment, email, shell or arbitrary URL tools.
 
-Each model phase is capped at 75 seconds, five model calls and 1,200 output tokens per call. SDK retries, tracing and Responses storage are disabled. A process-local single-run lock and 15-second cooldown reduce accidental repeats. Ambiguity preflight happens before model calls. These limits do not constitute a distributed public-demo budget. Public hosting must add shared quota enforcement and an approved model-usage allowance before enabling anonymous agent calls.
+Each model phase is capped at 75 seconds, six model calls and 1,200 output tokens per call. SDK retries, tracing and Responses storage are disabled. A process-local single-run lock and 15-second cooldown reduce accidental repeats. Ambiguity preflight happens before model calls. PostgreSQL serializes reservations across server instances. The approved $5 allocation reserves $0.05 for each of at most 90 public agent attempts ($4.50), leaving $0.50 for release verification. Each model request is bounded to 40,000 serialized UTF-8 bytes; six calls at standard gpt-6-luna pricing ($0.10/M input, $0.50/M output, verified October 21) fit conservatively within that reservation, including token/framing margin. Failed attempts keep their reservations. Streaming and automatic retries are disabled. Pricing changes require revalidation before raising limits. Qloo planning is capped at 100 public attempts per UTC day, eight per hashed visitor/day. Database failures fail closed; sample mode remains available.
 
 Explicit live verification: pnpm exec tsx scripts/agent-smoke.ts. It consumes Qloo/model quota and stores raw evidence only in ignored .runtime/. Offline tests never use real provider credentials.
 
@@ -73,10 +73,16 @@ See [VERIFICATION.md](VERIFICATION.md) for evidence and remaining limits. The HT
 
 Next.js App Router scaffolded with the shadcn CLI, Radix primitives, React, Tailwind 4, Prisma/PostgreSQL and Better Auth. Editorial parchment/ink/copper direction, system sans and Georgia (no external font requests), original CSS artwork. No stock venue photographs or misleading imagery.
 
-No public repo or deployment exists yet. Obtain approval for the concrete publication destination after live integration is reviewable. A contest-ready release needs real Qloo use, required agent behavior, a public functional demo, a detectable open-source license and a truthful entry. Final prize entry is a user handoff. Rules: https://qloo.devpost.com/rules
+Public source publication is approved. Vercel secret transfer to common-ground-agent and a $5 demo budget are approved; hosting is temporarily blocked by the account’s 200-project limit. An empty template project is proposed for repurposing pending specific approval. A contest-ready release needs real Qloo use, required agent behavior, a public functional demo, a detectable open-source license and a truthful entry. Final prize entry is a user handoff. Rules: https://qloo.devpost.com/rules
 
 Official references: https://github.com/qloo/qloo-hackathon-kit ; https://better-auth.com/docs/adapters/prisma ; installed Next.js docs in `node_modules/next/dist/docs`.
 
-Original code is prepared under [MIT](LICENSE); adapted UI components retain the notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). See [RELEASE_PLAN.md](RELEASE_PLAN.md) for the proposed public repository and hosting gates, and [ENTRY_DRAFT.md](ENTRY_DRAFT.md) for the local contest story. No public repository or demo URL is claimed yet.
+Original code is prepared under [MIT](LICENSE); adapted UI components retain the notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). See [RELEASE_PLAN.md](RELEASE_PLAN.md) for the proposed public repository and hosting gates, and [ENTRY_DRAFT.md](ENTRY_DRAFT.md) for the local contest story. Published links will be added after verification.
 
 Qloo access and location references: https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide ; https://docs.qloo.com/reference/parameters . Both were read in the authenticated Chrome session on October 21.
+
+## Transparent group comparison
+
+Choose **Try a real comparison**, then **Find common ground**. This loads illustrative Jazz/Coffee inputs for New York City; all venue results and affinity signals come from fresh Qloo calls. The comparison approach makes no OpenAI calls. It scores the same three candidate IDs once per explicit interest profile, ranks scores within each column, and orders complete rows by their worst rank, breaking ties by rank sum. Missing data cannot win. Ties do not imply personal compatibility. The agent calls this comparison tool before inspecting identities and must retain the first balanced candidate as its first suggestion.
+
+The production database uses a project-only schema and Hetzner’s published PostgreSQL CA in certs/hetzner-sql-ca.pem, with certificate and hostname verification enabled. Credentials remain private. Source: https://docs.hetzner.com/managed/databases/postgresql/ .

@@ -19,7 +19,7 @@ export const agentReportSchema = agentDecisionSchema.extend({
   activity: z
     .array(z.object({ tool: z.string().max(80), detail: z.string().max(200) }))
     .max(6),
-  modelCalls: z.number().int().min(1).max(5),
+  modelCalls: z.number().int().min(1).max(6),
   inputTokens: z.number().int().min(0),
   outputTokens: z.number().int().min(0),
 })

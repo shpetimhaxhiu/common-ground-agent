@@ -150,6 +150,21 @@ export function normalizeLiveResult(
       "Qloo did not return a valid result. Please try again later."
     )
   const envelope = parsedEnvelope.data
+  const interpreted = z
+    .object({
+      signal_tags: z.array(
+        z.object({ input: z.string(), tagId: z.string(), name: z.string() })
+      ),
+    })
+    .safeParse(envelope.interpretation)
+  const resolvedTags = interpreted.success
+    ? signals.flatMap((input) => {
+        const lookup =
+          request.resolutions?.find((r) => r.input === input)?.id ?? input
+        const tag = interpreted.data.signal_tags.find((t) => t.input === lookup)
+        return tag ? [{ input, id: tag.tagId, name: tag.name }] : []
+      })
+    : []
   if (envelope.status === "needs_input") {
     const parsed = resolutionSchema.safeParse(
       (payload as { resolution?: unknown }).resolution
@@ -200,6 +215,7 @@ export function normalizeLiveResult(
     }))
   return {
     mode: "live",
+    resolvedTags,
     candidates,
     request,
     interpretation: signals,

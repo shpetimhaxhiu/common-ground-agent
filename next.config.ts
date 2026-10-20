@@ -1,3 +1,6 @@
-import type { NextConfig } from "next";
-const nextConfig: NextConfig = { serverExternalPackages: ["@qloo/qloo-harness"] };
-export default nextConfig;
+import type { NextConfig } from "next"
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["@qloo/qloo-harness"],
+  outputFileTracingIncludes: { "/api/*": ["./certs/hetzner-sql-ca.pem"] },
+}
+export default nextConfig

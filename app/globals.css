@@ -1326,3 +1326,14 @@ footer > span {
 
 .agent-plan{overflow-wrap:anywhere}
 .agent-plan [data-slot=plan-header]>div{min-width:0}
+
+.signal-comparison {border:1px solid var(--border);border-radius:20px;padding:clamp(20px,4vw,36px);margin-bottom:32px;background:var(--card)}
+.signal-comparison h2 {font-size:clamp(25px,3vw,38px);margin:10px 0 16px}
+.signal-comparison > p {max-width:750px;line-height:1.65}
+.signal-scroll {overflow-x:auto;margin:24px 0}
+.signal-scroll table {border-collapse:collapse;width:100%;min-width:440px;text-align:left}
+.signal-scroll caption {text-align:left;font-size:12px;padding-bottom:14px;opacity:.7}
+.signal-scroll th,.signal-scroll td {padding:16px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.signal-scroll small {display:block;font-weight:400;font-size:12px;margin-top:5px;opacity:.75}
+.signal-scroll td b {font-size:22px}
+.signal-scroll .balance-label {color:#416554;opacity:1;font-weight:600}

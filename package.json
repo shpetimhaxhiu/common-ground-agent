@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1 --port 3161",
     "build": "next build",
+    "vercel-build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",

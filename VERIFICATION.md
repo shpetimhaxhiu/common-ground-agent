@@ -1,5 +1,13 @@
 # Verification — October 21, 2026
 
+## Dependency release check
+
+- GitHub initially reported Undici 8.9.0 and Lodash 4.17.21 advisories. pnpm-workspace.yaml now overrides affected Undici 8.x to 8.10.2 and Lodash to 4.18.1. shadcn CLI moved to devDependencies. pnpm version pinned at 11.25.0.
+- pnpm audit --prod reports zero vulnerabilities after the updates. Full audit retains one high-severity Braces 3.0.3 alert with no published patch. It is introduced through development glob tooling; neither API deployment file trace includes Braces. No user-provided glob is executed. This is a documented residual build-tool alert, not a claim that all dependencies are advisory-free.
+- A pre-existing transitive Vitest peer wants Node 22/24 type definitions while the scaffold uses @types/node 20. Runtime is Node 24.18.0, Vitest is not used by this app’s test runner, and typecheck/build pass.
+- After the dependency updates: 22 offline tests, shared counter concurrency/rollback, typecheck/lint/build, and another real agent run passed. That run made six model calls, five tool activities, 7,899 input and 434 output tokens. Final production HTTP/database smoke repeated successfully on the isolated remote schema.
+- References: https://github.com/nodejs/undici/releases/tag/v8.10.2 ; https://github.com/lodash/lodash/releases ; https://github.com/micromatch/braces/issues/84 .
+
 ## Latest release verification — comparison and shared quotas
 
 - Public source created and pushed; GitHub reports PUBLIC visibility and detects MIT. Known configured secrets were absent from staged diff and Git history.

@@ -4,3 +4,7 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   msw: false
+
+overrides:
+  "undici@>=8.0.0 <8.10.2": 8.10.2
+  "lodash@<4.18.1": 4.18.1

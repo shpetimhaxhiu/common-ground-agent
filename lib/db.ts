@@ -31,6 +31,9 @@ export const db =
             }
           : {}),
         max: 5,
+        connectionTimeoutMillis: 10_000,
+        idleTimeoutMillis: 10_000,
+        statement_timeout: 10_000,
       },
       { schema }
     ),

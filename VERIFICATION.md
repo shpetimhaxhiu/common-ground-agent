@@ -73,3 +73,7 @@ The historical findings below describe the October 20 baseline and are supersede
 - Better Auth is configured with PostgreSQL, but account/password creation is disabled and no account UI is claimed.
 - No public deployment, public repository, video upload or new final contest submission.
 - Screenshot capture initially returned stale content from another tab. Those frames were not used as app proof. App-focused captures are saved under ignored `evidence/`.
+
+## Database availability follow-up
+
+One production smoke attempt returned 503 for a save after waiting on the remote connection; earlier identical checks had passed. Direct TLS and Prisma health queries succeeded. Added 10-second connection/statement bounds and idle-pool expiry, plus credential-free error-code logs. A fresh production build/server then passed all eight HTTP/database checks. The transient failure’s original cause was not conclusively identified; do not present the successful retry as proof of unlimited database availability. Public deployment still requires its own end-to-end verification.

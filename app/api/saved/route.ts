@@ -63,7 +63,13 @@ export async function GET() {
       },
       { headers: { "Cache-Control": "no-store" } }
     )
-  } catch {
+  } catch (error) {
+    console.error("Saved collection unavailable", {
+      code:
+        error && typeof error === "object" && "code" in error
+          ? String(error.code)
+          : "unknown",
+    })
     return Response.json(
       { error: "The plan collection is temporarily unavailable." },
       { status: 503 }
@@ -127,7 +133,13 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 30,
     })
     return Response.json({ id: record.id }, { status: 201 })
-  } catch {
+  } catch (error) {
+    console.error("Saved plan persistence unavailable", {
+      code:
+        error && typeof error === "object" && "code" in error
+          ? String(error.code)
+          : "unknown",
+    })
     return Response.json(
       { error: "The plan could not be stored." },
       { status: 503 }

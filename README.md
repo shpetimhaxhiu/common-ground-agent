@@ -2,9 +2,9 @@
 
 A group-outing planner for the Qloo Agentic Hackathon. Bring two to four explicit taste profiles together, inspect trade-offs, revise a shortlist, and save or copy a plan.
 
-**Public source:** https://github.com/shpetimhaxhiu/common-ground-agent (MIT). **Hosted demo:** pending hosting-slot approval. **Contest entry:** not submitted.
+**Public source:** https://github.com/shpetimhaxhiu/common-ground-agent (MIT). **Hosted demo:** https://common-ground-agent.vercel.app — public, no Vercel login required. **Contest entry:** not submitted.
 
-**Status: live Qloo planning verified locally.** The issued event key works, and live recommendations, interest clarification and private saved-plan persistence have been exercised in Chrome. The fictional sample remains separately labeled. The user approved reuse of the configured OpenAI key. A bounded OpenAI Agents SDK host now inspects real Qloo candidates, reviews unknown constraints and returns a validated shortlist. Browser agent save/reload/reopen is verified. Public release is being prepared; the final Qloo entry remains pending.
+**Status: live Qloo planning verified locally.** The issued event key works, and live recommendations, interest clarification and private saved-plan persistence have been exercised in Chrome. The fictional sample remains separately labeled. The user approved reuse of the configured OpenAI key. A bounded OpenAI Agents SDK host now inspects real Qloo candidates, reviews unknown constraints and returns a validated shortlist. Browser agent save/reload/reopen is verified. Public release is live and verified; the final Qloo entry remains pending.
 
 ## Run locally
 
@@ -75,11 +75,11 @@ See [VERIFICATION.md](VERIFICATION.md) for evidence and remaining limits. The HT
 
 Next.js App Router scaffolded with the shadcn CLI, Radix primitives, React, Tailwind 4, Prisma/PostgreSQL and Better Auth. Editorial parchment/ink/copper direction, system sans and Georgia (no external font requests), original CSS artwork. No stock venue photographs or misleading imagery.
 
-Public source publication is approved. Vercel secret transfer to common-ground-agent and a $5 demo budget are approved; hosting is temporarily blocked by the account’s 200-project limit. An empty template project is proposed for repurposing pending specific approval. A contest-ready release needs real Qloo use, required agent behavior, a public functional demo, a detectable open-source license and a truthful entry. Final prize entry is a user handoff. Rules: https://qloo.devpost.com/rules
+Public source publication is approved. The user approved repurposing the empty Vercel template as common-ground-agent and a $5 demo budget. Production secrets are stored as sensitive variables. Public hosting and end-to-end live planning are verified. A contest-ready release needs real Qloo use, required agent behavior, a public functional demo, a detectable open-source license and a truthful entry. Final prize entry is a user handoff. Rules: https://qloo.devpost.com/rules
 
 Official references: https://github.com/qloo/qloo-hackathon-kit ; https://better-auth.com/docs/adapters/prisma ; installed Next.js docs in `node_modules/next/dist/docs`.
 
-Original code is prepared under [MIT](LICENSE); adapted UI components retain the notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). See [RELEASE_PLAN.md](RELEASE_PLAN.md) for the proposed public repository and hosting gates, and [ENTRY_DRAFT.md](ENTRY_DRAFT.md) for the local contest story. Published links will be added after verification.
+Original code is prepared under [MIT](LICENSE); adapted UI components retain the notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). See [RELEASE_PLAN.md](RELEASE_PLAN.md) for the proposed public repository and hosting gates, and [ENTRY_DRAFT.md](ENTRY_DRAFT.md) for the local contest story. The public source and demo links above are verified.
 
 Qloo access and location references: https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide ; https://docs.qloo.com/reference/parameters . Both were read in the authenticated Chrome session on October 21.
 
@@ -90,3 +90,11 @@ Choose **Try a real comparison**, then **Find common ground**. This loads illust
 The production database uses a project-only schema and Hetzner’s published PostgreSQL CA in certs/hetzner-sql-ca.pem, with certificate and hostname verification enabled. Credentials remain private. Source: https://docs.hetzner.com/managed/databases/postgresql/ .
 
 Shared counter integration check (writes isolated test counter rows, no model/provider calls): `pnpm exec tsx scripts/usage-smoke.ts`. Production-build HTTP checks can use `CG_TEST_BASE` to target a separately running instance; the default remains loopback port 3161.
+
+## Deployment
+
+Vercel project **common-ground-agent**, scope **shpetimhaxhius-projects**. The empty next-js-saas-starter-template was repurposed with explicit approval; no project was deleted or paid plan activated. Canonical demo: https://common-ground-agent.vercel.app . Production-only sensitive variables: DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL, QLOO_API_KEY, OPENAI_API_KEY, ENABLE_LIVE_QLOO, ENABLE_PLANNING_AGENT. Never use public-prefixed provider keys.
+
+Deploy with `pnpm dlx vercel@64.7.0 deploy --prod --yes --scope shpetimhaxhius-projects --project prj_hOV7qS2tjgCdiswz04tA0qlLxRM1`. Git metadata on the reused project is still managed by v0; Vercel rejected direct Git reconnection. This release uses the verified local GitHub source through the CLI. GitHub pushes alone are not the deployment workflow, and the old v0 project should not be published over this release. No other template service or database was modified. pnpm-workspace.yaml declares required trusted install scripts and explicitly disables unrelated ones.
+
+To review: open the public app, choose **Try a real comparison**, then **Find common ground**. Choose **Agent · inspect and compare** to exercise real model/tool planning. Choose a place, save, refresh and open Saved plans. The live example chooses a date three days ahead; the separately labeled fictional sample is fixed. Venue conditions remain unverified. Shared daily/total allowances are documented above; provider failures are explicit.

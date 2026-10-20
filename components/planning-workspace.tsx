@@ -83,6 +83,7 @@ export function PlanningWorkspace({
   const [selected, setSelected] = useState<Candidate | null>(null)
   const [saved, setSaved] = useState<SavedPlan[]>([])
   const [savedOpen, setSavedOpen] = useState(false)
+  const [savedLoading, setSavedLoading] = useState(false)
   const [saveBusy, setSaveBusy] = useState(false)
   const [copyFallback, setCopyFallback] = useState("")
   const [exclusions, setExclusions] = useState<{ id: string; name: string }[]>(
@@ -139,6 +140,7 @@ export function PlanningWorkspace({
   }
   async function openSaved() {
     setSavedOpen(true)
+    setSavedLoading(true)
     setError("")
     try {
       const response = await fetch("/api/saved")
@@ -147,8 +149,10 @@ export function PlanningWorkspace({
       setSaved(body.plans)
     } catch {
       setError(
-        "Saved plans are unavailable. Check the local database and try again."
+        "Saved plans are temporarily unavailable. Try again in a moment."
       )
+    } finally {
+      setSavedLoading(false)
     }
   }
   async function savePlan(candidate: Candidate) {
@@ -567,6 +571,9 @@ export function PlanningWorkspace({
                   onClick={() => {
                     setForm({
                       ...initialRequest,
+                      date: new Date(Date.now() + 3 * 86_400_000)
+                        .toISOString()
+                        .slice(0, 10),
                       mode: "live",
                       assistance: "compare",
                       city: "New York City",
@@ -1105,7 +1112,11 @@ export function PlanningWorkspace({
             </DialogDescription>
           </DialogHeader>
           {error && <p role="alert">{error}</p>}
-          {saved.length === 0 ? (
+          {savedLoading ? (
+            <p className="small-copy" role="status">
+              Loading your saved plans…
+            </p>
+          ) : saved.length === 0 ? (
             <p className="small-copy">
               No saved plans here yet. Choose an option and save it.
             </p>

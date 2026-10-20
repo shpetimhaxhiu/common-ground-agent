@@ -1,6 +1,6 @@
 # Common Ground — a host for different tastes
 
-Local review draft for the Qloo Agentic Hackathon. This document is not an entry receipt. Public source and hosting are approved; verified URLs will be added after release.
+Local review draft for the Qloo Agentic Hackathon. This document is not an entry receipt. Public source and hosted app are published and verified. This is a prepared entry package, not a submission receipt.
 
 ## One-line description
 
@@ -36,10 +36,20 @@ The event key needs the hackathon host rather than the production host. Interest
 
 ## Remaining release work
 
-Resolve the hosting project limit, publish approved source and demo, verify the public workflow; enter those URLs into Devpost and complete the required final human submission.
+Complete Devpost registration, populate the entry with the published links and story, and complete the required final human submission.
 
-Public source: https://github.com/shpetimhaxhiu/common-ground-agent (MIT). Hosted demo URL is pending. No prize, user traction, submission or organizer acceptance is claimed.
+Public source: https://github.com/shpetimhaxhiu/common-ground-agent (MIT). Hosted demo: https://common-ground-agent.vercel.app . No prize, user traction, submission or organizer acceptance is claimed.
 
 ## Why Qloo is central
 
 The same shortlist is compared against each explicit interest profile using Qloo Insights. Common Ground shows raw affinity, within-profile relative rank, and a reproducible balance rule that minimizes the worst rank. This makes trade-offs inspectable instead of hiding them behind a generated explanation. The bounded agent must run that real comparison, inspect candidate identities and review unknown constraints before making an editorial suggestion. The Qloo-only comparison also works without a language model.
+
+## Judge testing instructions
+
+1. Open https://common-ground-agent.vercel.app without signing in.
+2. Choose Try a real comparison, then Find common ground. Jazz/Coffee are illustrative inputs; the places and affinity signals come from Qloo.
+3. Inspect the relative-rank matrix and balanced starting point. Choose Agent · inspect and compare to see the completed Qloo lookups and constraint review.
+4. Choose Make this the plan, save it, refresh and reopen it from Saved plans. Collections are private to each browser.
+5. Edit interests or exclude an option; clarify ambiguous meanings when asked. Prices, hours, access, quietness, diets and availability remain unknown, and nothing is booked.
+
+Public application is verified in Chrome and by eight anonymous HTTP/database checks. No video is required by the current event rules. The app is on existing/free hosting with a finite, shared model allowance; Qloo-only comparison does not use model tokens.

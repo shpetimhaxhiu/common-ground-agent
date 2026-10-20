@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import { initialRequest } from "../lib/domain"
-const base = "http://127.0.0.1:3161"
+const base = process.env.CG_TEST_BASE ?? "http://127.0.0.1:3161"
 const post = (path: string, body: unknown, origin = base) =>
   fetch(base + path, {
     method: "POST",

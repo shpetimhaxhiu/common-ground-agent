@@ -1,29 +1,23 @@
-# Common Ground release package
+# Common Ground release status
 
-## Prepared and verified
+Public source: https://github.com/shpetimhaxhiu/common-ground-agent — verified PUBLIC, MIT detected by GitHub. Original code by Shpetim Haxhiu; adapted components retain their Apache-2.0/MIT notices. Configured-secret scan passed for staged changes and Git history before publication. Provider responses, private collections, environment files and screenshots remain excluded.
 
-Local source and runnable demo: http://127.0.0.1:3161. Live Qloo and OpenAI agent flows are verified in VERIFICATION.md. The configured OpenAI key was reused with the user's explicit approval; no credential was copied into source.
+## Verified application
 
-The proposed publication destination is **github.com/shpetimhaxhiu/common-ground-agent**, a new public repository. Read-only GitHub checks confirmed the authenticated account is shpetimhaxhiu and this repository did not exist. No repository creation, remote push or public licensing announcement has occurred.
+Local demo: http://127.0.0.1:3161. Qloo recommendation, explicit ambiguity choices, same-shortlist per-interest comparison, bounded Agents SDK inspection, constraint review and private save/reload/reopen work. Twenty-two offline tests and eight API/database checks pass. Production-build API checks also pass against the isolated remote schema with verified TLS. Mobile comparison verified at 390px with document width 381px.
 
-Original project code is prepared under MIT, authored by Shpetim Haxhiu. AI Elements and shadcn source notices are preserved separately. The publication excludes .env files, generated clients, node_modules, .runtime provider/model responses, private saved collections and evidence screenshots. The repository does not include Qloo response datasets.
+## Hosting
 
-## Publication approval
+The user approved public hosting, private OpenAI/Qloo secrets in common-ground-agent under shpetimhaxhius-projects, and at most $5 of existing OpenAI credit. Shared PostgreSQL reservations permit at most 90 public model attempts at a conservative $0.05 reservation ($4.50), leaving $0.50 for release verification. Model input/output/call bounds and zero retries enforce the reservation assumptions. No paid hosting upgrade is authorized.
 
-Project AGENTS.md requires demonstrated live behavior and publication approval before a public release. Live behavior is now demonstrated. Obtain approval for the exact public repository above and its source license before creating/pushing it.
+Vercel rejected new project creation at its 200-project Hobby limit. Read-only inspection found next-js-saas-starter-template (prj_hOV7qS2tjgCdiswz04tA0qlLxRM1) with no deployments or domains. Rename/repurpose approval is pending. Do not overwrite a deployed project, delete projects or change billing.
 
-## Hosted demo work after source approval
+Existing remote PostgreSQL uses only the new Common Ground schema. Both migrations applied. The app verifies the provider’s certificate using the public CA from https://docs.hetzner.com/managed/databases/postgresql/ . Local database/collections remain preserved. Credentials remain ignored/private.
 
-Select and verify a concrete free hosting/database destination before publishing or transmitting credentials there. The current PostgreSQL database runs locally and cannot serve a remote deployment as configured. Do not open its port publicly or change its authentication rules.
+After hosting approval: rename/configure the empty project, transfer approved secrets privately, configure production origin, deploy, verify anonymous public planning and save/reopen, and add the verified URL to README/ENTRY_DRAFT.
 
-Before enabling anonymous model calls, implement shared usage enforcement and obtain a concrete usage allowance. Process-local locks and pacing do not constrain a scaled public deployment. Model reuse approval is for current project work; it does not authorize unlimited public consumption or paid plan upgrades.
+## Contest
 
-Store Qloo/OpenAI credentials only in the approved host's secret store after destination approval, update application origin and cookie settings, migrate only the new isolated target, and verify the public end-to-end flow. Preserve local collections and database credentials.
+Chrome verified Qloo’s My projects page still says “Register for this hackathon”; no Qloo registration or submission receipt exists. The API-key request is separate from Devpost registration. The published rules require a functional externally hosted app, public licensed source and a truthful text description; video is explicitly optional. ENTRY_DRAFT.md supplies the story and source URL; demo URL pending.
 
-## Contest delivery
-
-ENTRY_DRAFT.md is the current truthful story. Add verified public source/demo URLs after release. Recheck current official Qloo rules, eligibility and required fields. A final prize entry and any new binding agreements require the appropriate human action/confirmation. No submitted or winning status is claimed.
-
-## October 21 authorization and hosting state
-
-Public source/demo publication is explicitly approved. Private OpenAI/Qloo secret transfer to common-ground-agent in shpetimhaxhius-projects and $5 maximum existing model credit are approved. Shared PostgreSQL counter reservations and per-model request bounds implemented. Existing remote DB isolated schema and verified TLS are ready. Vercel project creation rejected at 200-project Hobby limit. Empty next-js-saas-starter-template has no deployments/domains; specific rename/repurpose approval pending. Do not replace a working project or upgrade billing.
+Final prize registration/submission is a human handoff under browser-use rules and project AGENTS.md. Do not claim submission, organizer acceptance, traction, or a prize without evidence.

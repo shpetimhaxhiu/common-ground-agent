@@ -38,7 +38,7 @@ The event key needs the hackathon host rather than the production host. Interest
 
 Resolve the hosting project limit, publish approved source and demo, verify the public workflow; enter those URLs into Devpost and complete the required final human submission.
 
-No public source URL, hosted demo, prize, user traction or organizer acceptance is claimed in this draft.
+Public source: https://github.com/shpetimhaxhiu/common-ground-agent (MIT). Hosted demo URL is pending. No prize, user traction, submission or organizer acceptance is claimed.
 
 ## Why Qloo is central
 

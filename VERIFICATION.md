@@ -2,6 +2,12 @@
 
 ## Latest release verification — comparison and shared quotas
 
+- Public source created and pushed; GitHub reports PUBLIC visibility and detects MIT. Known configured secrets were absent from staged diff and Git history.
+- Chrome comparison save/reload/reopen passed; older saved plans remain present. Mobile overflow from native grid controls was fixed; 390px viewport has 381px document width. Default viewport restored. Evidence: ignored evidence/comparison-mobile.png and evidence/comparison-desktop.png.
+- Production build API/database checks passed against the isolated remote schema: save/reopen and another-browser isolation. Both API traces include the public CA certificate for deployment.
+- Chrome Devpost My projects shows registration required; Qloo API access is separate and does not constitute contest registration.
+
+
 - Real Qloo same-shortlist comparison returned three rows for two explicit interest profiles. Raw affinities and relative ranks render in Chrome; no scores were fabricated.
 - Revised agent: six model calls, five completed tool activities (comparison, three identity inspections, constraint review), 7,899 input and 492 output tokens. Structured selection passed identity and balance validation.
 - Shared PostgreSQL usage reservations tested with 12 concurrent attempts against a limit of three: exactly three succeeded. Exhaustion rolled back an earlier counter in the same transaction.

@@ -1342,3 +1342,25 @@ footer > span {
 .occasion select {min-width:0;max-width:100%;width:100%}
 @media (max-width:1050px) {.planning-layout {grid-template-columns:minmax(0,1fr)} .occasion {grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px) {.person {grid-template-columns:repeat(2,minmax(0,1fr))} .person label {white-space:normal}}
+.qloo-evidence {margin-bottom:32px;padding:clamp(22px,4vw,38px);border-top:3px solid var(--copper);background:var(--card);border-radius:0 0 18px 18px}
+.qloo-evidence-heading {display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.qloo-evidence h2 {font-size:clamp(26px,3vw,38px);margin:12px 0 16px}
+.qloo-evidence-intro {max-width:75ch;line-height:1.7;color:var(--muted-foreground)}
+.qloo-source-label {font-size:12px;padding:8px 0;color:var(--copper)}
+.qloo-journey {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;padding:28px 0;list-style:none}
+.qloo-journey>li {min-width:0;border-top:1px solid var(--border);padding-top:18px}
+.qloo-journey h3 {font-size:20px;line-height:1.35;margin:12px 0}
+.qloo-journey p {font-size:14px;line-height:1.75;color:var(--muted-foreground)}
+.qloo-taste-tags {list-style:none;padding:0;margin:0}
+.qloo-taste-tags li {display:grid;gap:4px;margin:14px 0;font-size:14px;overflow-wrap:anywhere}
+.qloo-taste-tags small {color:var(--copper)}
+.qloo-record {border-top:1px solid var(--border);padding-top:12px;font-size:13px;line-height:1.7}
+.qloo-record summary {cursor:pointer;padding:10px 0;min-height:44px}
+.qloo-record code {font-size:12px;overflow-wrap:anywhere}
+.qloo-record ul {padding-left:20px}
+.resolution-continue {margin:20px 0 12px}
+.signal-reading {padding:16px 0 0 20px;border-top:1px solid var(--border);font-size:13px;line-height:1.7;max-width:80ch}
+.signal-reading li+li {margin-top:8px}
+@media(max-width:760px){.qloo-journey{grid-template-columns:1fr;gap:12px}.qloo-evidence-heading{gap:0}.qloo-evidence{padding:22px}.qloo-source-label{font-size:11px}}
+.occasion > .small-copy,.occasion > .occasion-note {grid-column:1/-1;font-size:12px;line-height:1.6}
+@media(max-width:700px){.table-art{overflow:clip}}

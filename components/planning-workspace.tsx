@@ -22,6 +22,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { QlooEvidence } from "@/components/qloo-evidence"
+import {
+  liveExample,
+  qlooTagCategory,
+  profileSignalSummary,
+} from "@/lib/qloo-presentation"
 import {
   Plan,
   PlanHeader,
@@ -67,11 +73,17 @@ const directions = {
 export function PlanningWorkspace({
   liveAvailable = false,
   agentAvailable = false,
+  initialDate = initialRequest.date,
 }: {
   liveAvailable?: boolean
   agentAvailable?: boolean
+  initialDate?: string
 }) {
-  const [form, setForm] = useState<PlanningRequest>(initialRequest)
+  const [form, setForm] = useState<PlanningRequest>(() =>
+    liveAvailable
+      ? liveExample(initialDate)
+      : { ...initialRequest, date: initialDate }
+  )
   const [interestText, setInterestText] = useState<Record<string, string>>({})
   const [result, setResult] = useState<PlanningResult | null>(null)
   const [busy, setBusy] = useState(false)
@@ -112,6 +124,18 @@ export function PlanningWorkspace({
             }
       ),
     }))
+  function loadExample(mode: "sample" | "live") {
+    const date = new Date(Date.now() + 3 * 86_400_000)
+      .toISOString()
+      .slice(0, 10)
+    setForm(mode === "live" ? liveExample(date) : { ...initialRequest, date })
+    setInterestText({})
+    setResult(null)
+    setResolutionIssues([])
+    setExclusions([])
+    setError("")
+    setNotice("")
+  }
   async function buildPlan(next: PlanningRequest = form) {
     setError("")
     setResolutionIssues([])
@@ -128,6 +152,7 @@ export function PlanningWorkspace({
       const body = await response.json()
       if (!response.ok) {
         setResolutionIssues(body.resolutionIssues ?? [])
+        if (response.status === 409 && body.resolutionIssues?.length) return
         throw new Error(body.error || "The plan could not be prepared.")
       }
       setResult(body)
@@ -259,7 +284,10 @@ export function PlanningWorkspace({
             <ol className="how-list">
               <li>Add two to four people and explicit interests.</li>
               <li>Set a city, date and budget target.</li>
-              <li>Compare a shortlist or change the direction.</li>
+              <li>Let Qloo resolve the interests and discover real places.</li>
+              <li>
+                Compare Qloo affinities across each explicit interest profile.
+              </li>
               <li>Save or copy a plan after checking the unknowns.</li>
             </ol>
             <p className="small-copy">
@@ -274,12 +302,12 @@ export function PlanningWorkspace({
         <span className="status-dot" />
         {form.mode === "sample"
           ? `SAMPLE WORKSPACE · Fictional places and prices. ${liveAvailable ? "Choose Live Qloo for real provider results." : "Live Qloo is disabled on this server."}`
-          : "LIVE QLOO · Real cultural affinities. Venue conditions still need checking."}
+          : "LIVE QLOO · Cultural interests → real places and affinity signals. Venue conditions still need checking."}
       </div>
       <main>
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <p className="eyebrow">GOOD COMPANY. A BETTER PLAN.</p>
+            <p className="eyebrow">GOOD COMPANY. POWERED BY QLOO.</p>
             <h1 id="hero-title">
               Different tastes.
               <br />
@@ -507,13 +535,10 @@ export function PlanningWorkspace({
                 id="data-mode"
                 value={form.mode}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    mode: e.target.value as "sample" | "live",
-                  })
+                  loadExample(e.target.value as "sample" | "live")
                 }
               >
-                <option value="sample">Explore fictional sample</option>
+                <option value="sample">Fictional Prishtina example</option>
                 <option value="live" disabled={!liveAvailable}>
                   Live Qloo · {liveAvailable ? "real results" : "disabled"}
                 </option>
@@ -568,36 +593,7 @@ export function PlanningWorkspace({
                 <Button
                   variant="outline"
                   disabled={busy}
-                  onClick={() => {
-                    setForm({
-                      ...initialRequest,
-                      date: new Date(Date.now() + 3 * 86_400_000)
-                        .toISOString()
-                        .slice(0, 10),
-                      mode: "live",
-                      assistance: "compare",
-                      city: "New York City",
-                      participants: initialRequest.participants
-                        .slice(0, 2)
-                        .map((p, i) => ({
-                          ...p,
-                          name: i ? "Sam" : "Alex",
-                          interests: [i ? "Coffee" : "Jazz"],
-                        })),
-                      resolutions: [
-                        {
-                          input: "Coffee",
-                          id: "urn:tag:cuisine:qloo:coffee",
-                          name: "Coffee",
-                        },
-                      ],
-                    })
-                    setInterestText({})
-                    setResult(null)
-                    setResolutionIssues([])
-                    setExclusions([])
-                    setError("")
-                  }}
+                  onClick={() => loadExample("live")}
                 >
                   Try a real comparison
                   <ArrowRight size={16} />
@@ -606,7 +602,10 @@ export function PlanningWorkspace({
               <p className="occasion-note">
                 {form.mode === "sample"
                   ? "Sample works in Prishtina only. Places and prices are fictional."
-                  : "Use a precise city name. Budget is a target; verify venue details."}
+                  : "Qloo supplies the places and affinity signals. Use a precise city name; budget is a target, not a verified price."}
+              </p>
+              <p className="small-copy">
+                Switching planning source loads that source’s example group.
               </p>
             </aside>
           </div>
@@ -634,58 +633,112 @@ export function PlanningWorkspace({
               className="resolution-panel"
               aria-label="Clarify your interests"
             >
-              <h3>A little more specific, please.</h3>
+              <p className="eyebrow">QLOO / UNDERSTAND YOUR TASTES</p>
+              <h3>Which meaning fits your group?</h3>
               <p>
-                Choose the meaning you intended, then prepare the plan again. If
-                no choice fits, edit that interest above.
+                Qloo needs a clearer meaning for these interests. An interest, a
+                venue setting and an activity can have the same name. Choose
+                what you mean; we won’t guess for you.
               </p>
-              {resolutionIssues.map((issue) => (
-                <div className="resolution-choice" key={issue.input}>
-                  <Label htmlFor={`resolve-${issue.input}`}>
-                    {issue.input}
-                  </Label>
-                  {issue.candidates.length > 0 ? (
-                    <select
-                      id={`resolve-${issue.input}`}
-                      value={
-                        form.resolutions?.find((r) => r.input === issue.input)
-                          ?.id ?? ""
-                      }
-                      onChange={(event) => {
-                        const choice = issue.candidates.find(
-                          (c) => c.id === event.target.value
-                        )
-                        setForm((previous) => ({
-                          ...previous,
-                          resolutions: [
-                            ...(previous.resolutions ?? []).filter(
-                              (r) => r.input !== issue.input
-                            ),
-                            ...(choice
-                              ? [
-                                  {
-                                    input: issue.input,
-                                    id: choice.id,
-                                    name: choice.name,
-                                  },
-                                ]
-                              : []),
-                          ],
-                        }))
-                      }}
-                    >
-                      <option value="">Choose a meaning…</option>
-                      {issue.candidates.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name} · {c.type?.replace("urn:tag:", "") ?? c.id}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <p>No matching Qloo tag. Try a more specific interest.</p>
+              {resolutionIssues.map((issue) => {
+                const selectedResolution = form.resolutions?.find(
+                  (r) => r.input === issue.input
+                )
+                const selectedMeaning = issue.candidates.find(
+                  (c) => c.id === selectedResolution?.id
+                )
+                return (
+                  <div className="resolution-choice" key={issue.input}>
+                    <Label htmlFor={`resolve-${issue.input}`}>
+                      {issue.input}
+                    </Label>
+                    {issue.candidates.length > 0 ? (
+                      <select
+                        id={`resolve-${issue.input}`}
+                        value={
+                          form.resolutions?.find((r) => r.input === issue.input)
+                            ?.id ?? ""
+                        }
+                        onChange={(event) => {
+                          const choice = issue.candidates.find(
+                            (c) => c.id === event.target.value
+                          )
+                          setForm((previous) => ({
+                            ...previous,
+                            resolutions: [
+                              ...(previous.resolutions ?? []).filter(
+                                (r) => r.input !== issue.input
+                              ),
+                              ...(choice
+                                ? [
+                                    {
+                                      input: issue.input,
+                                      id: choice.id,
+                                      name: choice.name,
+                                    },
+                                  ]
+                                : []),
+                            ],
+                          }))
+                        }}
+                      >
+                        <option value="">Choose a meaning…</option>
+                        {issue.candidates.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name} — {qlooTagCategory(c.id, c.type).label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <p>
+                        No matching Qloo tag was returned.{" "}
+                        <a href="#taste-table">Edit this interest above</a> and
+                        use a more specific term.
+                      </p>
+                    )}
+                    {selectedMeaning && (
+                      <p className="small-copy">
+                        {
+                          qlooTagCategory(
+                            selectedMeaning.id,
+                            selectedMeaning.type
+                          ).explanation
+                        }
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+              <Button
+                className="resolution-continue"
+                disabled={
+                  busy ||
+                  resolutionIssues.some(
+                    (issue) =>
+                      !issue.candidates.some(
+                        (c) =>
+                          c.id ===
+                          form.resolutions?.find((r) => r.input === issue.input)
+                            ?.id
+                      )
+                  )
+                }
+                onClick={() => void buildPlan()}
+              >
+                Use these meanings <ArrowRight size={16} />
+              </Button>
+              <details className="qloo-record">
+                <summary>Inspect Qloo’s returned categories</summary>
+                <ul>
+                  {resolutionIssues.flatMap((issue) =>
+                    issue.candidates.map((c) => (
+                      <li key={issue.input + c.id}>
+                        {issue.input}: {c.name} <code>{c.id}</code>
+                      </li>
+                    ))
                   )}
-                </div>
-              ))}
+                </ul>
+              </details>
             </div>
           )}
         </section>
@@ -694,6 +747,7 @@ export function PlanningWorkspace({
           aria-labelledby="shortlist-title"
           aria-busy={busy}
         >
+          {result?.mode === "live" && <QlooEvidence result={result} />}
           {result?.coverage && (
             <section
               className="signal-comparison"
@@ -757,6 +811,19 @@ export function PlanningWorkspace({
                 Absolute scores across columns are not calibrated to one
                 another. Missing signals remain unknown.
               </p>
+              <ul
+                className="signal-reading"
+                aria-label="How to read these Qloo signals"
+              >
+                {result.coverage.profiles.map((profile, i) => {
+                  return (
+                    <li key={profile.index}>
+                      <strong>{profile.interests.join(" + ")}:</strong>{" "}
+                      {profileSignalSummary(result.coverage!, i)}
+                    </li>
+                  )
+                })}
+              </ul>
             </section>
           )}
           {result?.agent && (

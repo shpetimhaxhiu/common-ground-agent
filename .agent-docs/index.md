@@ -12,6 +12,9 @@
 - `lib/qloo-client.ts`: fixed hackathon HTTP transport, strict locality boundary, bounded/paced calls, no redirects; one transient read-only retry within the existing deadline/call cap, credential-free stream errors.
 - `tests/planning-allowance.test.ts`: allowance database failure stays closed before provider calls and logs no request/error contents.
 - `components/planning-workspace.tsx`: complete interactive workspace and accessible Radix dialogs.
+- `components/qloo-evidence.tsx`: visible live Qloo taste → places → affinity evidence, with source identifiers behind details.
+- `lib/qloo-presentation.ts`: live example, human-readable taxonomy categories and explicit tied/missing signal summaries.
+- `app/page.tsx`: request-time date and live/agent availability flags; no automatic provider call.
 - `app/api/plan/route.ts`: bounded request validation and explicit live-access gate.
 - `app/api/saved/route.ts`: browser-owned private collection, Prisma persistence, HttpOnly random token.
 - `lib/auth.ts`, `app/api/auth/[...all]/route.ts`: Better Auth foundation; account creation disabled.

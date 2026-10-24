@@ -2,9 +2,9 @@
 
 A group-outing planner for the Qloo Agentic Hackathon. Bring two to four explicit taste profiles together, inspect trade-offs, revise a shortlist, and save or copy a plan.
 
-**Public source:** https://github.com/shpetimhaxhiu/common-ground-agent (MIT). **Hosted demo:** https://common-ground-agent.vercel.app — public, no Vercel login required. **Contest entry:** not submitted.
+**Public source:** https://github.com/shpetimhaxhiu/common-ground-agent (MIT). **Hosted demo:** https://common-ground-agent.vercel.app — public, no Vercel login required. **Submitted contest entry:** https://devpost.com/software/common-ground-xauf3m .
 
-**Status: live Qloo planning verified locally.** The issued event key works, and live recommendations, interest clarification and private saved-plan persistence have been exercised in Chrome. The fictional sample remains separately labeled. The user approved reuse of the configured OpenAI key. A bounded OpenAI Agents SDK host now inspects real Qloo candidates, reviews unknown constraints and returns a validated shortlist. Browser agent save/reload/reopen is verified. Public release is live and verified; the final Qloo entry remains pending.
+**Status: submitted; public live Qloo flow verified.** The default workspace starts with the real Qloo comparison, without making any provider call until requested. Qloo resolves explicit tastes, discovers real places and supplies per-profile affinities. The visible evidence trail shows resolved meanings, result identities and the app's separate balance rule. Ambiguous meanings have plain-language categories and an explicit confirmation action; identifiers stay in an inspectable detail section. Equal affinities are explained as ties, not strong personal matches. The fictional Prishtina example remains separately labeled. The optional bounded agent interprets Qloo evidence and inspects candidates; it does not supply the underlying places or affinity scores. Sample and agent plan save/reload/reopen are verified. See VERIFICATION.md for dated release evidence and limitations.
 
 ## Run locally
 

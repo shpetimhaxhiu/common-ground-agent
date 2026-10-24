@@ -36,7 +36,9 @@ The event key needs the hackathon host rather than the production host. Interest
 
 ## Remaining release work
 
-Complete Devpost registration, populate the entry with the published links and story, and complete the required final human submission.
+Devpost registration and final human submission are complete. On October 24, authenticated Chrome showed the explicit "Project submitted!" confirmation and "SUBMITTED TO Qloo Agentic Hackathon" section. The entry includes its name, pitch, story, technology tags, public demo and source links, project start date, thumbnail and two gallery screenshots. Published entry: https://devpost.com/software/common-ground-xauf3m . No judging acceptance, ranking or prize is claimed. Edits remain possible until October 30, 2026 at 11:45pm EDT (October 31 at 04:45 Europe/Budapest).
+
+October 24 recheck: the public home page loads. The first fresh live comparison returned a generic planning-provider unavailable error; a deliberate retry succeeded with Da Capo, Lyceum Theatre and Island, including the real affinity/rank matrix. The transient failure's cause remains unresolved. Authentic home-screen and live-matrix screenshots were captured for the entry gallery. This check did not rerun the model agent or the complete release suite.
 
 Public source: https://github.com/shpetimhaxhiu/common-ground-agent (MIT). Hosted demo: https://common-ground-agent.vercel.app . No prize, user traction, submission or organizer acceptance is claimed.
 

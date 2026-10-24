@@ -89,6 +89,8 @@ Choose **Try a real comparison**, then **Find common ground**. This loads illust
 
 The production database uses a project-only schema and Hetzner’s published PostgreSQL CA in certs/hetzner-sql-ca.pem, with certificate and hostname verification enabled. Credentials remain private. Source: https://docs.hetzner.com/managed/databases/postgresql/ .
 
+Read-only Qloo GETs may retry once after a network disconnect, interrupted response body, or HTTP 502/503/504. Both attempts count toward the existing ten-call transport budget and share the original abort deadline; a retry does not extend either limit. Authentication, rate limits, invalid responses, model calls and quota transactions never retry automatically. Response-stream cleanup cannot replace a safe provider error with a raw exception. Planning failures log only a fixed pipeline stage and elapsed milliseconds. An unavailable allowance database returns 503 and fails closed before any provider call, rather than blaming the provider or bypassing the shared limits.
+
 Shared counter integration check (writes isolated test counter rows, no model/provider calls): `pnpm exec tsx scripts/usage-smoke.ts`. Production-build HTTP checks can use `CG_TEST_BASE` to target a separately running instance; the default remains loopback port 3161.
 
 ## Deployment

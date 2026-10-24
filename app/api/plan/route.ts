@@ -18,6 +18,8 @@ export async function POST(request: Request) {
     )
   if (Number(request.headers.get("content-length") ?? 0) > 12_000)
     return Response.json({ error: "Request is too large." }, { status: 413 })
+  let stage = "request"
+  const startedAt = Date.now()
   try {
     const text = await request.text()
     if (Buffer.byteLength(text) > 12_000)
@@ -44,7 +46,11 @@ export async function POST(request: Request) {
         },
         { status: 503 }
       )
-    if (input.mode === "live") await reserveLiveRequest(request)
+    if (input.mode === "live") {
+      stage = "allowance"
+      await reserveLiveRequest(request)
+    }
+    stage = input.mode === "sample" ? "sample" : (input.assistance ?? "direct")
     return Response.json(
       input.mode === "sample"
         ? planSample(input)
@@ -58,6 +64,20 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof DemoLimitError)
       return Response.json({ error: error.message }, { status: 429 })
+    // Only fixed stage labels and timing are logged. Never log raw errors,
+    // provider bodies, interests, locations, guest names or credentials.
+    console.error("Planning request failed", {
+      stage,
+      elapsedMs: Date.now() - startedAt,
+    })
+    if (stage === "allowance")
+      return Response.json(
+        {
+          error:
+            "The shared planning allowance could not be checked. Your inputs are preserved; try again later.",
+        },
+        { status: 503, headers: { "Cache-Control": "no-store" } }
+      )
     let cause: unknown = error
     for (let depth = 0; depth < 5 && cause instanceof Error; depth++) {
       if (cause instanceof QlooTransportError)

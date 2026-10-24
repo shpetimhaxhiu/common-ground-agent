@@ -93,3 +93,11 @@ The historical findings below describe the October 20 baseline and are supersede
 ## Database availability follow-up
 
 One production smoke attempt returned 503 for a save after waiting on the remote connection; earlier identical checks had passed. Direct TLS and Prisma health queries succeeded. Added 10-second connection/statement bounds and idle-pool expiry, plus credential-free error-code logs. A fresh production build/server then passed all eight HTTP/database checks. The transient failure’s original cause was not conclusively identified; do not present the successful retry as proof of unlimited database availability. Public deployment still requires its own end-to-end verification.
+
+## October 24 reliability follow-up
+
+A public comparison failed once with a generic provider-unavailable response and succeeded on deliberate retry. Existing Vercel log queries contained no diagnostic entry, so the original failure cannot be conclusively attributed to Qloo or the allowance database. A direct TLS database health query passed and the shared quota remained below its limits.
+
+A deterministic interrupted-body reproduction exposed an error-handling gap: stream read/cancellation exceptions escaped the typed Qloo transport path. Transport now normalizes these errors and permits one retry for read-only Qloo GET network/body interruptions or HTTP 502/503/504, inside the original abort deadline and ten-call cap. Auth/rate-limit/invalid-response errors, quota transactions and model requests do not retry. The planning route logs fixed stage labels and elapsed time only; allowance failures return 503 and cannot bypass shared limits.
+
+Checks: 27 offline tests (including interrupted-stream recovery, deadline sharing, call-budget enforcement and allowance failure before provider access), TypeScript, lint and production build passed. The production build on loopback port 3162 passed all eight API/database checks against an isolated test collection. Production rollout and browser verification follow below. No schema or budget limits changed.

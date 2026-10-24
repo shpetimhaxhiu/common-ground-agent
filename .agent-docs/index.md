@@ -9,7 +9,8 @@
 - `components/ai-elements/plan.tsx`: official AI Elements Plan adapted to static reports without motion dependency.
 - `ENTRY_DRAFT.md`: truthful local contest story; no publication or submission claim.
 - `RELEASE_PLAN.md`: exact proposed public repository, source approval and hosting/usage gates.
-- `lib/qloo-client.ts`: fixed hackathon HTTP transport, strict locality boundary, bounded/paced calls, no redirects or retries.
+- `lib/qloo-client.ts`: fixed hackathon HTTP transport, strict locality boundary, bounded/paced calls, no redirects; one transient read-only retry within the existing deadline/call cap, credential-free stream errors.
+- `tests/planning-allowance.test.ts`: allowance database failure stays closed before provider calls and logs no request/error contents.
 - `components/planning-workspace.tsx`: complete interactive workspace and accessible Radix dialogs.
 - `app/api/plan/route.ts`: bounded request validation and explicit live-access gate.
 - `app/api/saved/route.ts`: browser-owned private collection, Prisma persistence, HttpOnly random token.
@@ -19,4 +20,4 @@
 - `tests/qloo-client.test.ts`: transport destination, credential placement, error privacy and response bounds with mocked fetch only.
 - `tests/api-smoke.ts`: actual local HTTP/database checks, writes a fictional fixture to its own test collection.
 
-Current release state: public MIT source https://github.com/shpetimhaxhiu/common-ground-agent. Named Vercel secret transfer and $5 maximum existing model credit approved. Shared quotas: lib/usage.ts with UsageCounter migration; comparison: lib/coverage.ts, lib/qloo-coverage.ts. Production schema/TLS and public API persistence verified. User approved repurposing the empty Vercel template; app live at https://common-ground-agent.vercel.app . Scoped CLI deployment is documented in README; Git connection remains v0-managed. Devpost My projects still requires registration; no Qloo final entry. Preserve local collections and use a human handoff for final prize registration/submission.
+Current release state: public MIT source https://github.com/shpetimhaxhiu/common-ground-agent. Named Vercel secret transfer and $5 maximum existing model credit approved. Shared quotas: lib/usage.ts with UsageCounter migration; comparison: lib/coverage.ts, lib/qloo-coverage.ts. Production schema/TLS and public API persistence verified. User approved repurposing the empty Vercel template; app live at https://common-ground-agent.vercel.app . Scoped CLI deployment is documented in README; Git connection remains v0-managed. Qloo entry submitted by the user and confirmed October 24: https://devpost.com/software/common-ground-xauf3m . Preserve local collections. The October 24 reliability follow-up adds safe pipeline-stage diagnostics and bounded read-only Qloo recovery; see VERIFICATION.md for release evidence and remaining uncertainty.

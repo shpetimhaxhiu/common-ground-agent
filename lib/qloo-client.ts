@@ -4,7 +4,8 @@ export const HACKATHON_BASE_URL = "https://hackathon.api.qloo.com"
 export class QlooTransportError extends Error {
   constructor(
     message: string,
-    public status = 502
+    public status = 502,
+    public retryable = false
   ) {
     super(message)
   }
@@ -20,7 +21,7 @@ export function createHackathonClient(
 ): QlooToolClient {
   let calls = 0
   let nextStart = 0
-  async function get(path: string, query: Query, options?: Options) {
+  async function attempt(path: string, query: Query, options?: Options) {
     if (++calls > 10)
       throw new QlooTransportError(
         "Live Qloo request budget reached. Simplify the interests and try again."
@@ -36,16 +37,19 @@ export function createHackathonClient(
           Array.isArray(value) ? value.join(",") : String(value)
         )
     }
+    const signal = options?.signal ?? AbortSignal.timeout(45_000)
     const response = await fetcher(url, {
       headers: { "X-Api-Key": apiKey, Accept: "application/json" },
-      signal: options?.signal ?? AbortSignal.timeout(45_000),
+      signal,
       redirect: "error",
       cache: "no-store",
     }).catch(() => {
       throw new QlooTransportError(
-        options?.signal?.aborted
+        signal.aborted
           ? "Live Qloo took too long. Your inputs are preserved; try again later."
-          : "Live Qloo could not be reached. Your inputs are preserved; try again later."
+          : "Live Qloo could not be reached. Your inputs are preserved; try again later.",
+        502,
+        !signal.aborted
       )
     })
     if (!response.ok) {
@@ -55,11 +59,12 @@ export function createHackathonClient(
         403: "Live Qloo access does not permit this request.",
         429: "Live Qloo has reached a usage limit. Wait before trying again.",
       }
-      await response.body?.cancel()
+      await response.body?.cancel().catch(() => {})
       throw new QlooTransportError(
         messages[response.status] ??
           "Qloo did not complete the request. Try again later.",
-        response.status === 429 ? 429 : response.status === 400 ? 400 : 502
+        response.status === 429 ? 429 : response.status === 400 ? 400 : 502,
+        [502, 503, 504].includes(response.status)
       )
     }
     const reader = response.body?.getReader()
@@ -78,8 +83,19 @@ export function createHackathonClient(
           )
         chunks.push(value)
       }
+    } catch (error) {
+      if (error instanceof QlooTransportError) throw error
+      throw new QlooTransportError(
+        signal.aborted
+          ? "Live Qloo took too long. Your inputs are preserved; try again later."
+          : "Live Qloo's response was interrupted. Your inputs are preserved; try again later.",
+        502,
+        !signal.aborted
+      )
     } finally {
-      await reader.cancel()
+      // A disconnected stream can also reject cancellation. Cleanup must not
+      // replace the bounded, credential-free error above with a raw exception.
+      await reader.cancel().catch(() => {})
     }
     let data
     try {
@@ -90,6 +106,26 @@ export function createHackathonClient(
     if (!data || typeof data !== "object" || data.success === false)
       throw new QlooTransportError("Qloo did not return a successful response.")
     return data
+  }
+  async function get(path: string, query: Query, options?: Options) {
+    // Only read-only Qloo GETs may retry, once. Both attempts share the same
+    // deadline and ten-call counter; model calls and quota writes never retry.
+    const boundedOptions = {
+      ...options,
+      signal: options?.signal ?? AbortSignal.timeout(45_000),
+    }
+    try {
+      return await attempt(path, query, boundedOptions)
+    } catch (error) {
+      if (
+        !(error instanceof QlooTransportError) ||
+        !error.retryable ||
+        boundedOptions.signal.aborted ||
+        calls >= 10
+      )
+        throw error
+      return attempt(path, query, boundedOptions)
+    }
   }
   return {
     insights: (query, options) =>

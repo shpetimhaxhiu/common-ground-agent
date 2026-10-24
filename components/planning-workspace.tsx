@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { QlooEvidence } from "@/components/qloo-evidence"
+import { CulturalPicker } from "@/components/cultural-picker"
 import {
   liveExample,
   qlooTagCategory,
@@ -156,7 +157,7 @@ export function PlanningWorkspace({
         throw new Error(body.error || "The plan could not be prepared.")
       }
       setResult(body)
-      setForm(next)
+      setForm(body.request)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Please try again.")
     } finally {
@@ -282,7 +283,10 @@ export function PlanningWorkspace({
               </DialogDescription>
             </DialogHeader>
             <ol className="how-list">
-              <li>Add two to four people and explicit interests.</li>
+              <li>
+                Add two to four people and explicit interests, artists, films or
+                books.
+              </li>
               <li>Set a city, date and budget target.</li>
               <li>Let Qloo resolve the interests and discover real places.</li>
               <li>
@@ -445,8 +449,24 @@ export function PlanningWorkspace({
                       aria-describedby={`hint-${person.id}`}
                     />
                     <span id={`hint-${person.id}`} className="field-hint">
-                      Separate up to 5 interests with commas.
+                      Separate up to 5 general interests with commas. In live
+                      mode, you can leave this blank after choosing a cultural
+                      taste below.
                     </span>
+                    {form.mode === "live" && (
+                      <CulturalPicker
+                        value={person.seeds ?? []}
+                        disabled={busy}
+                        onChange={(seeds) =>
+                          setForm((previous) => ({
+                            ...previous,
+                            participants: previous.participants.map((p, i) =>
+                              i === index ? { ...p, seeds } : p
+                            ),
+                          }))
+                        }
+                      />
+                    )}
                   </article>
                 ))}
               </div>

@@ -1,6 +1,8 @@
 import { z } from "zod"
 import type { Candidate, PlanningRequest, PlanningResult } from "./domain"
 import { createHackathonClient } from "./qloo-client"
+import { verifyCulturalSeeds } from "./qloo-seeds"
+import { profileInterests } from "./cultural-seeds"
 export type ResolutionIssue = {
   input: string
   candidates: { id: string; name: string; type?: string }[]
@@ -69,13 +71,32 @@ export async function planLive(
   const key = JSON.stringify([
     request.city,
     request.participants.map((p) => p.interests),
+    request.participants.map((p) => p.seeds),
     request.resolutions,
     request.excluded,
     request.revision,
   ])
   const cached = liveCache.get(key)
   if (cached && cached.until > Date.now())
-    return { ...cached.result, request, createdAt: new Date().toISOString() }
+    return {
+      ...cached.result,
+      request: {
+        ...request,
+        participants: request.participants.map((p) => ({
+          ...p,
+          ...(p.seeds
+            ? {
+                seeds: p.seeds.map((s) =>
+                  cached.result.resolvedSeeds!.find(
+                    (v) => v.id.toLowerCase() === s.id.toLowerCase()
+                  )!
+                ),
+              }
+            : {}),
+        })),
+      },
+      createdAt: new Date().toISOString(),
+    }
   if (liveBusy || Date.now() < nextCallAt)
     throw new Error(
       "Live Qloo is busy. Wait a moment before preparing another plan."
@@ -112,15 +133,35 @@ async function executeLive(request: PlanningRequest): Promise<PlanningResult> {
   const { createDirectQlooWorkflowExecutor } =
     await import("@qloo/qloo-harness")
   // Explicit client: no global config, default production endpoint or file logs.
-  const executor = createDirectQlooWorkflowExecutor(
-    createHackathonClient(process.env.QLOO_API_KEY),
-    {}
-  )
+  const client = createHackathonClient(process.env.QLOO_API_KEY)
+  const executor = createDirectQlooWorkflowExecutor(client, {})
   const signals = [...new Set(request.participants.flatMap((p) => p.interests))]
-  if (signals.length > 8)
+  const seeds = [
+    ...new Map(
+      request.participants
+        .flatMap((p) => p.seeds ?? [])
+        .map((s) => [s.id.toLowerCase(), s])
+    ).values(),
+  ]
+  if (signals.length + seeds.length > 8)
     throw new Error(
-      "Live Qloo supports up to eight distinct interests per plan. Remove a few and try again."
+      "Live Qloo supports up to eight distinct interests and cultural selections per plan. Remove a few and try again."
     )
+  const signal = AbortSignal.timeout(45_000)
+  const verified = await verifyCulturalSeeds(client, seeds, signal)
+  request = {
+    ...request,
+    participants: request.participants.map((p) => ({
+      ...p,
+      ...(p.seeds
+        ? {
+            seeds: p.seeds.map((s) =>
+              verified.find((v) => v.id.toLowerCase() === s.id.toLowerCase())!
+            ),
+          }
+        : {}),
+    })),
+  }
   const tags = signals.map(
     (input) => request.resolutions?.find((r) => r.input === input)?.id ?? input
   )
@@ -128,13 +169,15 @@ async function executeLive(request: PlanningRequest): Promise<PlanningResult> {
     "recommend",
     {
       target_type: "place",
-      signal_tags: tags,
-      signal_tags_operator: "union",
+      ...(verified.length ? { signals: verified.map((s) => s.id) } : {}),
+      ...(tags.length
+        ? { signal_tags: tags, signal_tags_operator: "union" }
+        : {}),
       filter_location: request.city,
       limit: 6,
       explain: true,
     },
-    { signal: AbortSignal.timeout(45_000) }
+    { signal }
   )
   return normalizeLiveResult(execution.result, request)
 }
@@ -216,13 +259,24 @@ export function normalizeLiveResult(
   return {
     mode: "live",
     resolvedTags,
+    resolvedSeeds: request.participants
+      .flatMap((p) => p.seeds ?? [])
+      .filter(
+        (s, i, all) =>
+          all.findIndex((v) => v.id.toLowerCase() === s.id.toLowerCase()) === i
+      ),
     candidates,
     request,
-    interpretation: signals,
+    interpretation: request.participants.flatMap(profileInterests),
     createdAt: new Date().toISOString(),
     trace: [
       "Combined explicit interests without participant names",
       "Called Qloo recommend through the official server-side harness",
+      ...(request.participants.some((p) => p.seeds?.length)
+        ? [
+            "Verified selected artists, films and books with Qloo before using their entity IDs as taste signals",
+          ]
+        : []),
       "Applied explicit entity exclusions to the returned candidates",
       `Returned ${candidates.length} options; no purchases or reservations`,
     ],

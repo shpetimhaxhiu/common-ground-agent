@@ -85,6 +85,14 @@ Qloo access and location references: https://docs.qloo.com/reference/qloo-llm-ha
 
 ## Transparent group comparison
 
+### Artist, film and book tastes
+
+In live mode, each person can choose **Artist**, **Film** or **Book**, enter a name/title, click **Search Qloo**, and explicitly choose the intended record. Search returns at most five typed matches with bounded provider descriptions and record IDs; editions and similarly named works are never silently chosen. Up to three cultural selections per person and eight distinct combined interests/selections per plan are supported. General interests can be empty when that person has a cultural selection.
+
+The server verifies selected IDs and types through Qloo `/entities`, replaces client labels with Qloo names, and supplies the IDs to the official harness `recommend.signals` input (`signal.interests.entities`). The same verified IDs are used separately for each participant's affinity comparison. Cultural evidence and selections survive save/reload/reopen and are included in the bounded, nickname-free agent context. Provider results may be cached for five minutes; no generated replacement is used.
+
+`POST /api/tastes` is same-origin, server-only and explicitly triggered, with no requests while typing. Search shares the 100 daily public Qloo-attempt ceiling with planning, with an additional 20 searches per hashed visitor/day; the existing eight planning attempts per visitor/day and $5 model budget remain. Search and comparison do not call OpenAI. Venue conditions remain unknown, and affinity is an aggregate relationship rather than a personal satisfaction prediction.
+
 Choose **Try a real comparison**, then **Find common ground**. This loads illustrative Jazz/Coffee inputs for New York City; all venue results and affinity signals come from fresh Qloo calls. The comparison approach makes no OpenAI calls. It scores the same three candidate IDs once per explicit interest profile, ranks scores within each column, and orders complete rows by their worst rank, breaking ties by rank sum. Missing data cannot win. Ties do not imply personal compatibility. The agent calls this comparison tool before inspecting identities and must retain the first balanced candidate as its first suggestion.
 
 The production database uses a project-only schema and Hetzner’s published PostgreSQL CA in certs/hetzner-sql-ca.pem, with certificate and hostname verification enabled. Credentials remain private. Source: https://docs.hetzner.com/managed/databases/postgresql/ .

@@ -1,6 +1,7 @@
 import { z } from "zod"
 import type { AgentReport } from "./agent-contract"
 import type { SignalCoverage } from "./coverage"
+import { culturalSeedSchema } from "./cultural-seeds"
 
 export const requestSchema = z.object({
   mode: z.enum(["sample", "live"]),
@@ -8,11 +9,17 @@ export const requestSchema = z.object({
   city: z.string().trim().min(2).max(80),
   participants: z
     .array(
-      z.object({
-        id: z.string().max(40),
-        name: z.string().trim().min(1).max(30),
-        interests: z.array(z.string().trim().min(1).max(100)).min(1).max(5),
-      })
+      z
+        .object({
+          id: z.string().max(40),
+          name: z.string().trim().min(1).max(30),
+          interests: z.array(z.string().trim().min(1).max(100)).max(5),
+          seeds: z.array(culturalSeedSchema).max(3).optional(),
+        })
+        .refine(
+          (p) => p.interests.length + (p.seeds?.length ?? 0) > 0,
+          "Add an interest or select an artist, film or book."
+        )
     )
     .min(2)
     .max(4),
@@ -50,6 +57,7 @@ export type Candidate = {
   links: { label: string; url: string }[]
 }
 export type PlanningResult = {
+  resolvedSeeds?: z.infer<typeof culturalSeedSchema>[]
   resolvedTags?: { input: string; id: string; name: string }[]
   coverage?: SignalCoverage
   agent?: AgentReport

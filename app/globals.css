@@ -1364,3 +1364,18 @@ footer > span {
 @media(max-width:760px){.qloo-journey{grid-template-columns:1fr;gap:12px}.qloo-evidence-heading{gap:0}.qloo-evidence{padding:22px}.qloo-source-label{font-size:11px}}
 .occasion > .small-copy,.occasion > .occasion-note {grid-column:1/-1;font-size:12px;line-height:1.6}
 @media(max-width:700px){.table-art{overflow:clip}}
+.cultural-picker {grid-column:1/-1;min-width:0;border-top:1px solid var(--border);padding-top:18px;margin-top:14px}
+.cultural-picker .field-note {font-size:12px;line-height:1.6;margin:8px 0 14px}
+.cultural-search {display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:end}
+.cultural-search > div {min-width:0}
+.cultural-search label {display:block;font-size:12px;margin-bottom:6px}
+.cultural-search select {width:100%;min-width:0;min-height:40px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--background)}
+.cultural-search > button {grid-column:1/-1;justify-self:start}
+.cultural-selected,.cultural-results {list-style:none;padding:0;margin:12px 0;min-width:0}
+.cultural-selected li {display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border);padding:8px 0;font-size:13px}
+.cultural-selected span {min-width:0;overflow-wrap:anywhere}
+.cultural-selected small {display:block;opacity:.7}
+.cultural-results li {border-top:1px solid var(--border);padding:14px 0;font-size:13px;overflow-wrap:anywhere}
+.cultural-results p {font-size:12px;line-height:1.6;margin:8px 0}
+.cultural-results small {display:block;font-size:10px;margin:8px 0;overflow-wrap:anywhere}
+.cultural-results button {white-space:normal;height:auto;min-height:36px;text-align:left;max-width:100%}

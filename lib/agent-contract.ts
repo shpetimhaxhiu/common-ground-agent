@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { profileInterests } from "./cultural-seeds"
 import type { Candidate, PlanningRequest } from "./domain"
 
 export const agentDecisionSchema = z.object({
@@ -36,7 +37,7 @@ export function agentInput(request: PlanningRequest, candidates: Candidate[]) {
     },
     guests: request.participants.map((p, index) => ({
       guest: index + 1,
-      explicitInterests: p.interests,
+      explicitInterests: profileInterests(p),
     })),
     options: candidates.map((c) => ({
       id: c.id,

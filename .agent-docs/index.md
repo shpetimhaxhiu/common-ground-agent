@@ -7,7 +7,10 @@
 - `lib/agent-contract.ts`: bounded model input, output validation and persisted report schema.
 - `tests/agent-contract.test.ts`: name omission and evidence/identity guard checks; offline.
 - `components/ai-elements/plan.tsx`: official AI Elements Plan adapted to static reports without motion dependency.
-- `ENTRY_DRAFT.md`: truthful local contest story; no publication or submission claim.
+- `ENTRY_DRAFT.md`: prepared contest story and verified submission status.
+- `lib/cultural-seeds.ts`, `lib/qloo-seeds.ts`: typed cultural selections, Qloo identity/type verification and bounded public match records.
+- `components/cultural-picker.tsx`, `app/api/tastes/route.ts`: explicit artist/film/book search and selection; same-origin access and shared daily limits.
+- `tests/cultural-seeds.test.ts`: entity-only harness regression, identity/type validation, affinity input and agent-context coverage.
 - `RELEASE_PLAN.md`: exact proposed public repository, source approval and hosting/usage gates.
 - `lib/qloo-client.ts`: fixed hackathon HTTP transport, strict locality boundary, bounded/paced calls, no redirects; one transient read-only retry within the existing deadline/call cap, credential-free stream errors.
 - `tests/planning-allowance.test.ts`: allowance database failure stays closed before provider calls and logs no request/error contents.

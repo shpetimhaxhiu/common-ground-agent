@@ -37,6 +37,27 @@ assert.equal(
 )
 console.log("PASS cross-origin planning requests rejected")
 assert.equal(
+  (
+    await post(
+      "/api/tastes",
+      { query: "Radiohead", type: "artist" },
+      "https://untrusted.example"
+    )
+  ).status,
+  403
+)
+assert.equal(
+  (await post("/api/tastes", { query: "x", type: "artist" })).status,
+  400
+)
+assert.equal(
+  (await post("/api/tastes", { query: "Radiohead", type: "place" })).status,
+  400
+)
+console.log(
+  "PASS taste search rejects cross-origin and invalid inputs before provider calls"
+)
+assert.equal(
   (await post("/api/plan", { ...initialRequest, date: "not-a-date" })).status,
   400
 )

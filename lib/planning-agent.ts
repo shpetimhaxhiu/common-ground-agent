@@ -36,6 +36,7 @@ export async function planWithAgent(
   try {
     // Resolve ambiguity before consuming model tokens; preserve human tag choices.
     const base = await planLive(request)
+    request = base.request
     if (!base.candidates.length)
       return {
         ...base,

@@ -6,6 +6,7 @@ import { requestSchema } from "@/lib/domain"
 import type { Prisma } from "@/generated/prisma/client"
 import { agentReportSchema } from "@/lib/agent-contract"
 import { coverageSchema } from "@/lib/coverage"
+import { culturalSeedSchema } from "@/lib/cultural-seeds"
 
 const candidateSchema = z.object({
   id: z.string().max(150),
@@ -25,6 +26,7 @@ const candidateSchema = z.object({
 const savedSchema = z.object({
   candidate: candidateSchema,
   result: z.object({
+    resolvedSeeds: z.array(culturalSeedSchema).max(8).optional(),
     agent: agentReportSchema.optional(),
     coverage: coverageSchema.optional(),
     resolvedTags: z

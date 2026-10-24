@@ -23,7 +23,10 @@ export async function reserveUsage(entries: { id: string; limit: number }[]) {
     }
   })
 }
-export async function reserveLiveRequest(request: Request) {
+export async function reserveLiveRequest(
+  request: Request,
+  purpose: "plan" | "taste-search" = "plan"
+) {
   const day = new Date().toISOString().slice(0, 10)
   const visitor = createHmac("sha256", process.env.BETTER_AUTH_SECRET!)
     .update(
@@ -31,8 +34,17 @@ export async function reserveLiveRequest(request: Request) {
     )
     .digest("hex")
   await reserveUsage([
-    { id: `qloo:${day}`, limit: 100 },
-    { id: `visitor:${day}:${visitor}`, limit: 8 },
+    {
+      id: `qloo:${day}`,
+      limit: 100,
+    },
+    {
+      id:
+        purpose === "plan"
+          ? `visitor:${day}:${visitor}`
+          : `search-visitor:${day}:${visitor}`,
+      limit: purpose === "plan" ? 8 : 20,
+    },
   ])
 }
 export async function reserveAgentRun() {

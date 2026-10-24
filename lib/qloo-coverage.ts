@@ -4,6 +4,7 @@ import { buildCoverage } from "./coverage"
 import type { PlanningResult, PlanningRequest } from "./domain"
 import { planLive } from "./qloo"
 import { createHackathonClient } from "./qloo-client"
+import { profileInterests } from "./cultural-seeds"
 
 export async function compareSignals(
   base: PlanningResult,
@@ -12,11 +13,13 @@ export async function compareSignals(
 ) {
   const profiles = base.request.participants.map((p, index) => ({
     index,
-    interests: p.interests,
+    interests: profileInterests(p),
+    tags: p.interests,
+    seeds: p.seeds ?? [],
   }))
   const scores: Map<string, number>[] = []
   for (const profile of profiles) {
-    const tags = profile.interests.map(
+    const tags = profile.tags.map(
       (input) => base.resolvedTags?.find((t) => t.input === input)?.id
     )
     if (tags.some((t) => !t))
@@ -28,8 +31,15 @@ export async function compareSignals(
         "filter.type": "urn:entity:place",
         "filter.entities": base.candidates.map((c) => c.id),
         "filter.location.query": base.request.city,
-        "signal.interests.tags": tags as string[],
-        "operator.signal.interests.tags": "union",
+        ...(tags.length
+          ? {
+              "signal.interests.tags": tags as string[],
+              "operator.signal.interests.tags": "union",
+            }
+          : {}),
+        ...(profile.seeds.length
+          ? { "signal.interests.entities": profile.seeds.map((s) => s.id) }
+          : {}),
         take: 3,
       },
       { signal }

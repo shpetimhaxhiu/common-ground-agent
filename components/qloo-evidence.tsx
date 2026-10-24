@@ -1,5 +1,6 @@
 import type { PlanningResult } from "@/lib/domain"
 import { qlooTagCategory } from "@/lib/qloo-presentation"
+import { culturalLabels } from "@/lib/cultural-seeds"
 
 export function QlooEvidence({ result }: { result: PlanningResult }) {
   if (result.mode !== "live") return null
@@ -23,6 +24,20 @@ export function QlooEvidence({ result }: { result: PlanningResult }) {
         <li>
           <span className="eyebrow">01 / UNDERSTAND THE TASTES</span>
           <h3>The taste signals behind this query.</h3>
+          {!!result.resolvedSeeds?.length && (
+            <ul className="qloo-taste-tags">
+              {result.resolvedSeeds.map((seed) => (
+                <li key={seed.id}>
+                  <span>
+                    <strong>{seed.name}</strong> → {culturalLabels[seed.type]}
+                  </span>
+                  <small>
+                    Identity verified by Qloo · used as a cultural entity signal
+                  </small>
+                </li>
+              ))}
+            </ul>
+          )}
           {result.resolvedTags?.length ? (
             <ul className="qloo-taste-tags">
               {result.resolvedTags.map((tag) => (
@@ -41,7 +56,9 @@ export function QlooEvidence({ result }: { result: PlanningResult }) {
               ))}
             </ul>
           ) : (
-            <p>This saved result does not include resolved tag evidence.</p>
+            !result.resolvedSeeds?.length && (
+              <p>This saved result does not include resolved taste evidence.</p>
+            )
           )}
         </li>
         <li>
@@ -76,6 +93,11 @@ export function QlooEvidence({ result }: { result: PlanningResult }) {
           interests are resolved by Qloo before retrieval.
         </p>
         <ul>
+          {result.resolvedSeeds?.map((seed) => (
+            <li key={seed.id}>
+              {culturalLabels[seed.type]}: {seed.name}: <code>{seed.id}</code>
+            </li>
+          ))}
           {result.resolvedTags?.map((tag) => (
             <li key={tag.id + tag.input}>
               {tag.input}: <code>{tag.id}</code>

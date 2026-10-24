@@ -1,6 +1,6 @@
 # Common Ground — a host for different tastes
 
-Local review draft for the Qloo Agentic Hackathon. This document is not an entry receipt. Public source and hosted app are published and verified. This is a prepared entry package, not a submission receipt.
+Prepared story for the Qloo Agentic Hackathon, with verified submission status below. Public source and hosted app are published. The Devpost story may differ from this updated source document.
 
 ## One-line description
 
@@ -14,6 +14,7 @@ Choosing an outing with friends often leaves one person doing the research and e
 
 - A separately labeled fictional Prishtina sample lets visitors explore the interaction without provider calls.
 - Live mode uses the Qloo hackathon API through the official workflow harness. Ambiguous tag meanings require an explicit choice; unsupported interests stay unresolved.
+- Each person can search and select real artists, films and books. Qloo identities and types are verified before their entity IDs ground both place retrieval and separate per-person affinity queries. In a live New York test, Radiohead and a film/book profile ranked the same three places differently; the balance rule chose Brooklyn Bridge between their competing first choices, Little Italy and Top of the Rock. This demonstrates aggregate cultural relationships, not predicted individual satisfaction.
 - The OpenAI Agents SDK host inspects at least two Qloo candidate identities, reviews unknown constraints, and selects only inspected places. Its editorial suggestions are visibly distinct from provider facts.
 - A group can exclude options, change direction, choose a plan and save it in a browser-owned private PostgreSQL collection. Saved agent reports survive reloads.
 - Prices, opening hours, quietness, dietary suitability, access, availability and individual preference remain unverified. Nothing is booked or purchased.
@@ -26,7 +27,7 @@ Guest names stay outside provider/model requests. API keys stay server-side. Age
 
 ## What was verified
 
-Real Qloo access and quotas; agent-chosen Qloo entity lookups; constraint review; source-bound selections; browser clarification, live planning and save/reload/reopen; mobile and desktop report display. Twenty-two automated tests and eight HTTP/database checks cover current deterministic behavior. See VERIFICATION.md for run evidence and remaining limits. Live smoke data and screenshots are kept out of Git.
+Real Qloo access and quotas; artist/film/book search and identity verification; agent-chosen Qloo entity lookups; constraint review; source-bound selections; browser clarification, live planning and save/reload/reopen; mobile and desktop report display. Thirty-five automated tests and nine HTTP/database checks cover current deterministic behavior. See VERIFICATION.md for run evidence and remaining limits. Live smoke data and screenshots are kept out of Git.
 
 One verified agent run made five model calls, three Qloo entity lookups and one constraint review. It used 5,056 input tokens and 357 output tokens. It explicitly identified that the inspected descriptions did not establish a jazz offering. These counts describe that run, not every run.
 
